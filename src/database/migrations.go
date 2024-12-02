@@ -10,7 +10,22 @@ type Migration struct {
 }
 
 func ApplyMigrations() error {
-	migrations := []Migration{}
+	migrations := []Migration{
+		{
+			SQL: `
+				CREATE TABLE accounts (
+					id SERIAL PRIMARY KEY,
+					account_key VARCHAR(255) NOT NULL UNIQUE,
+					email VARCHAR(255) UNIQUE,
+					password VARCHAR(255),
+					name VARCHAR(255),
+					surname VARCHAR(255),
+					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+				);
+			`,
+			Version: 1,
+		},
+	}
 
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version INT PRIMARY KEY)`)
 	if err != nil {
