@@ -129,7 +129,7 @@ func generateSQLInsertFromEntity(entity interface{}) (string, []interface{}, err
 }
 
 func executeGeneratedSQL(query string, values []interface{}) (sql.Result, error) {
-	logger.Printf("Executing query: %s with values: %v\n", query, values)
+	logger.Printf("Executing query: %s\n", query)
 	result, err := db.Exec(query, values...)
 	if err != nil {
 		logger.Printf("Error executing query: %v\n", err)

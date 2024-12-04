@@ -14,7 +14,7 @@ func ApplyMigrations() error {
 		{
 			SQL: `
 				CREATE TABLE accounts (
-					id SERIAL PRIMARY KEY,
+					id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 					account_key VARCHAR(255) NOT NULL UNIQUE,
 					email VARCHAR(255) UNIQUE,
 					password VARCHAR(255),
@@ -24,6 +24,20 @@ func ApplyMigrations() error {
 				);
 			`,
 			Version: 1,
+		},
+		{
+			SQL: `
+				CREATE TABLE sessions (
+					id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+					account_id INT NOT NULL,
+					session_token VARCHAR(255) UNIQUE NOT NULL,
+					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+					expires_at TIMESTAMP,
+					last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+					FOREIGN KEY (account_id) REFERENCES accounts(id)
+				);
+			`,
+			Version: 2,
 		},
 	}
 

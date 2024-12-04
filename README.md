@@ -22,6 +22,7 @@
     - [ ] Allow to add a password and be able to login with it 
     - [X] Login with only Account Key (generated unique)
     - [X] Password encryption with salt (+ peper ?)
+    - [X] Basic cookie system with expiration
     - [ ] Cookie system with "remember me" thing
     - [ ] Email verification
     - [ ] Allow to force / unforce some fields for the login (password / email / account key) (at least 1 and password / email can't be alone) 

@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"moncaveau/database"
+	"moncaveau/utils"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,11 +36,38 @@ func POST_VerifyAccountLogin(c *gin.Context) {
 		}
 
 		if valid {
-			c.Status(http.StatusOK)
+			sessionToken, err := utils.GenerateSessionToken()
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Erreur interne impossible de créer une nouvelle session.",
+				})
+				return
+			}
 
-			// TODO set cookie and generate it + save it
 			// TODO check if remember me clicked (if so generate a non ending cookie)
-			// c.SetCookie()
+			// TODO setup a real expiration instead of 100 * days
+			expirationDate := time.Now().Add(100 * (24 * time.Hour))
+			err = database.CreateNewSession(data.AccountKey, sessionToken, expirationDate)
+			if err != nil {
+				logger.Println(err)
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Erreur interne impossible de sauvegarder votre session.",
+				})
+				return
+			}
+
+			c.SetCookie(
+				database.AuthCookieName,
+				sessionToken,
+				int(time.Until(expirationDate).Seconds()),
+				"/",
+				"",
+				false,
+				true,
+			)
+			c.JSON(http.StatusOK, gin.H{
+				"token": sessionToken,
+			})
 			return
 		}
 
@@ -47,4 +76,8 @@ func POST_VerifyAccountLogin(c *gin.Context) {
 		})
 		return
 	}
+
+	c.JSON(http.StatusBadRequest, gin.H{
+		"error": "Type de connection non implémentée.",
+	})
 }
