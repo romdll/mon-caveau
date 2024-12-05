@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <title>Mon Caveau - Se connecter</title>
+
+    <link rel="icon" type="image/x-icon" href="/site/icon/favicon.ico">
+    <link rel="stylesheet" href="/site/css/login.css">
+</head>
+<body>
+
+    <div class="container">
+        <img src="/site/images/logo.png" alt="Logo de moncaveau.com" class="logo">
+
+        <h1>Se connecter</h1>
+        
+        <form id="loginForm" method="POST">
+            <div class="input-group">
+                <input type="text" name="account_key" id="account_key" placeholder="xxxxxx-xxxxxx-xxxxxx" maxlength="20" pattern="\d{6}-\d{6}-\d{6}" required>
+            </div>
+
+            <button type="submit" class="login-button">Se connecter</button>
+        </form>
+
+        <div class="info-text">
+            <p>Vous n'avez pas de compte ?</p>
+            <p><button class="register-button" onclick="generateAccountKey()">Créer un compte</button></p>
+        </div>
+
+        <!-- <div class="unavailable">
+            <p>La connection avec mot de passe sera bientôt disponible.</p>
+        </div> -->
+
+    </div>
+
+    <script src="/site/js/login.js"></script>
+
+</body>
+</html>

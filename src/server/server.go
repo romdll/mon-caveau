@@ -15,12 +15,16 @@ func CreateServer() *gin.Engine {
 	// Attach middlewares
 	r.Use(middlewares.Logger())
 	r.Use(gin.Recovery())
+	r.Use(middlewares.AuthApi(
+		ApiBase,
+		[]string{ApiLogin},
+	))
 
 	// Attach handlers
-	r.POST("/api/login", handlers.POST_VerifyAccountLogin)
+	r.POST(ApiLogin, handlers.POST_VerifyAccountLogin)
 
 	// || Frontend
-	r.GET("/*filepath", frontend.ServeFrontendFiles)
+	r.GET(Frontend, frontend.ServeFrontendFiles)
 
 	return r
 }

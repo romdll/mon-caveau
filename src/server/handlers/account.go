@@ -45,11 +45,10 @@ func POST_VerifyAccountLogin(c *gin.Context) {
 			}
 
 			// TODO check if remember me clicked (if so generate a non ending cookie)
-			// TODO setup a real expiration instead of 100 * days
-			expirationDate := time.Now().Add(100 * (24 * time.Hour))
+			// TODO setup a real expiration instead of 200 * days
+			expirationDate := time.Now().Add(200 * (24 * time.Hour))
 			err = database.CreateNewSession(data.AccountKey, sessionToken, expirationDate)
 			if err != nil {
-				logger.Println(err)
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"error": "Erreur interne impossible de sauvegarder votre session.",
 				})
