@@ -15,10 +15,7 @@ func CreateServer() *gin.Engine {
 	// Attach middlewares
 	r.Use(middlewares.Logger())
 	r.Use(gin.Recovery())
-	r.Use(middlewares.AuthApi(
-		ApiBase,
-		[]string{ApiLogin},
-	))
+	r.Use(middlewares.AuthApi(AuthProtectedPages, AuthAvoidPages))
 
 	// Attach handlers
 	r.POST(ApiLogin, handlers.POST_VerifyAccountLogin)

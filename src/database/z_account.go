@@ -2,16 +2,15 @@ package database
 
 import "database/sql"
 
-// TODO check if account as no "force password"
-func CheckIfAccountKeyExists(accountKey string) (bool, error) {
-	var storedAccountKey string
-	err := db.QueryRow("SELECT account_key FROM accounts WHERE account_key = ?", accountKey).Scan(&storedAccountKey)
+func CheckIfAccountKeyExists(accountKey string) (bool, int, error) {
+	var accountId int
+	err := db.QueryRow("SELECT id FROM accounts WHERE account_key = ?", accountKey).Scan(&accountId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return false, nil
+			return false, -1, nil
 		}
-		return false, err
+		return false, -1, err
 	}
 
-	return true, nil
+	return true, accountId, nil
 }

@@ -12,10 +12,16 @@
 - [ ] Frontend
     - [X] Debug system with direct file access
     - [X] Release mode with no dependency (use embed.FS to keep files in memory (faster))
-    - [ ] Create the front page
-    - [ ] Create the login / register page
+    - [X] Create the front page
+    - [X] Create the login page 
+    - [ ] Create the register page
+    - [ ] Wine dashboard page
+    - [ ] Wine dashboard/statistics page
+    - [ ] Wine dashboard/collection page
+    - [ ] Wine dashboard/dashboard page
+    - [ ] All the pages above should be nice to use either on phone and computer
 - [ ] Login / Register
-    - [ ] Database system
+    - [X] Database system
     - [ ] Allow no login / register but create a temporary user with a infinite cookie
     - [X] Modern login system (no username / password)
     - [ ] Allow to add email to the account and be able to log in with it
@@ -26,6 +32,21 @@
     - [ ] Cookie system with "remember me" thing
     - [ ] Email verification
     - [ ] Allow to force / unforce some fields for the login (password / email / account key) (at least 1 and password / email can't be alone) 
+- [ ] Wine collection system
+    - [X] Basic database system 
+    - [X] Wines linked to a user 
+    - [ ] We can add a new region
+    - [ ] We can add a new type of wine
+    - [ ] We can add a new domain
+    - [ ] We can add a new bottle size
+    - [ ] Allow all the adds above with verification by admin
+    - [ ] Create statistics from the wines
+    - [ ] Allow kick modification of quantity
+    - [ ] Allow reusage of images of the same wine name for an other user
+- [ ] Wine rating system
+    - [ ] Be able to rate a wine very fast and easly
+- [ ] Wine label scan
+    - [ ] Train AI ?
 - [ ] Email system
     - [ ] Notification system (extra)
     - [ ] Email verification (login)

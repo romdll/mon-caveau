@@ -5,7 +5,7 @@ import (
 )
 
 type Migration struct {
-	Version int
+	Version float64
 	SQL     string
 }
 
@@ -23,7 +23,7 @@ func ApplyMigrations() error {
 					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 				);
 			`,
-			Version: 1,
+			Version: 1.0,
 		},
 		{
 			SQL: `
@@ -37,37 +37,124 @@ func ApplyMigrations() error {
 					FOREIGN KEY (account_id) REFERENCES accounts(id)
 				);
 			`,
-			Version: 2,
+			Version: 2.0,
+		},
+		{
+			SQL: `
+				CREATE TABLE wine_domains (
+					id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+					name VARCHAR(255) NOT NULL UNIQUE 
+				);
+			`,
+			Version: 3.1,
+		},
+		{
+			SQL: `
+				CREATE TABLE wine_regions (
+					id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+					name VARCHAR(255) NOT NULL,
+					country VARCHAR(255) NOT NULL,
+					CONSTRAINT unique_name_country UNIQUE (name, country)
+				);
+			`,
+			Version: 3.2,
+		},
+		{
+			SQL: `
+				CREATE TABLE wine_types (
+					id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+					name VARCHAR(255) NOT NULL UNIQUE
+				);
+			`,
+			Version: 3.3,
+		},
+		{
+			SQL: `
+				CREATE TABLE wine_bottle_sizes (
+					id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+					size REAL NOT NULL UNIQUE,
+					name REAL NOT NULL UNIQUE
+				);
+			`,
+			Version: 3.4,
+		},
+		{
+			SQL: `
+				CREATE TABLE wine_wines (
+					id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+					name VARCHAR(255) NOT NULL,
+
+					domaine_id INTEGER NOT NULL,
+					region_id INTEGER NOT NULL,
+					type_id INTEGER NOT NULL,
+					bottle_size_id INTEGER NOT NULL,
+
+					vintage INTEGER NOT NULL,
+					qantity INTEGER NOT NULL,
+
+					buy_price REAL,
+					description VARCHAR(3000),
+					image LONGTEXT,
+
+					account_id INT NOT NULL,
+
+					FOREIGN KEY (account_id) REFERENCES accounts(id),
+					FOREIGN KEY (domaine_id) REFERENCES wine_domains(id),
+					FOREIGN KEY (region_id) REFERENCES wine_regions(id),
+					FOREIGN KEY (type_id) REFERENCES wine_types(id),
+					FOREIGN KEY (bottle_size_id) REFERENCES wine_bottle_sizes(id)
+				);
+			`,
+			Version: 3.5,
+		},
+		{
+			SQL: `
+				CREATE TABLE wine_transactions (
+					id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+					wine_id INTEGER NOT NULL,
+					quantity INTEGER NOT NULL,
+					type VARCHAR(255) NOT NULL,
+					date DATETIME DEFAULT CURRENT_TIMESTAMP,
+					FOREIGN KEY (wine_id) REFERENCES wine_wines(id)
+				);
+			`,
+			Version: 3.6,
 		},
 	}
 
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version INT PRIMARY KEY)`)
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version FLOAT PRIMARY KEY)`)
 	if err != nil {
 		return fmt.Errorf("failed to ensure migrations table exists: %w", err)
 	}
 
-	var currentVersion int
+	var currentVersion float64
 	err = db.QueryRow(`SELECT IFNULL(MAX(version), 0) FROM schema_migrations`).Scan(&currentVersion)
 	if err != nil {
 		return fmt.Errorf("failed to fetch current schema version: %w", err)
 	}
 
+	migrationApplied := false
 	for _, migration := range migrations {
 		if migration.Version > currentVersion {
-			logger.Printf("Applying migration %d...\n", migration.Version)
+			migrationApplied = true
+			logger.Printf("Applying migration %.01f...\n", migration.Version)
 
 			if _, err := db.Exec(migration.SQL); err != nil {
-				return fmt.Errorf("failed to apply migration %d: %w", migration.Version, err)
+				return fmt.Errorf("failed to apply migration %.01f: %w", migration.Version, err)
 			}
 
 			if _, err := db.Exec(`INSERT INTO schema_migrations (version) VALUES (?)`, migration.Version); err != nil {
-				return fmt.Errorf("failed to record migration %d: %w", migration.Version, err)
+				return fmt.Errorf("failed to record migration %.01f: %w", migration.Version, err)
 			}
 
-			logger.Printf("Migration %d applied successfully\n", migration.Version)
+			logger.Printf("Migration %.01f applied successfully\n", migration.Version)
 		}
 	}
 
-	logger.Println("All migrations applied")
+	if migrationApplied {
+		logger.Println("All migrations applied")
+	} else {
+		logger.Println("No migrations to apply")
+	}
 	return nil
 }

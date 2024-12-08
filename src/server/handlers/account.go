@@ -27,7 +27,7 @@ func POST_VerifyAccountLogin(c *gin.Context) {
 
 	// Login with only account key
 	if data.AccountKey != "" && data.Email == "" && data.Password == "" {
-		valid, err := database.CheckIfAccountKeyExists(data.AccountKey)
+		valid, accountId, err := database.CheckIfAccountKeyExists(data.AccountKey)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Erreur interne",
@@ -47,7 +47,16 @@ func POST_VerifyAccountLogin(c *gin.Context) {
 			// TODO check if remember me clicked (if so generate a non ending cookie)
 			// TODO setup a real expiration instead of 200 * days
 			expirationDate := time.Now().Add(200 * (24 * time.Hour))
-			err = database.CreateNewSession(data.AccountKey, sessionToken, expirationDate)
+
+			newSession := database.Session{
+				AccountID:    accountId,
+				SessionToken: sessionToken,
+				CreatedAt:    time.Now(),
+				ExpiresAt:    expirationDate,
+				LastActivity: time.Now(),
+			}
+
+			_, err = database.InsertEntityById(newSession)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"error": "Erreur interne impossible de sauvegarder votre session.",

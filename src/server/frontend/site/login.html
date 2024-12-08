@@ -7,13 +7,13 @@
 
     <title>Mon Caveau - Se connecter</title>
 
-    <link rel="icon" type="image/x-icon" href="/site/icon/favicon.ico">
-    <link rel="stylesheet" href="/site/css/login.css">
+    <link rel="icon" type="image/x-icon" href="/icon/favicon.ico">
+    <link rel="stylesheet" href="/css/login.css">
 </head>
 <body>
 
     <div class="container">
-        <img src="/site/images/logo.png" alt="Logo de moncaveau.com" class="logo">
+        <img src="/images/logo.png" alt="Logo de moncaveau.com" class="logo">
 
         <h1>Se connecter</h1>
         
@@ -29,14 +29,27 @@
             <p>Vous n'avez pas de compte ?</p>
             <p><button class="register-button" onclick="generateAccountKey()">Créer un compte</button></p>
         </div>
-
-        <!-- <div class="unavailable">
-            <p>La connection avec mot de passe sera bientôt disponible.</p>
-        </div> -->
-
     </div>
 
-    <script src="/site/js/login.js"></script>
+    <div id="loggedInModal" class="modal">
+        <div class="modal-content">
+            <h2 id="loggedInTitle">Vous êtes déjà connecté !</h2>
+            <p>Redirection vers votre tableau de bord dans <span id="countdown">3</span> secondes...</p>
+        </div>
+    </div>
+
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <h2>Erreur</h2>
+            <p>Clé de compte invalide. Veuillez réessayer.</p>
+            <button onclick="closeModal('errorModal')">Fermer</button>
+        </div>
+    </div>
+
+    <script src="/js/login.js"></script>
+    <script>
+        offerRedirectIfAlreadyLoggedIn({{.LoggedIn}});
+    </script>
 
 </body>
 </html>
