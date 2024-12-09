@@ -8,15 +8,17 @@ const (
 	AuthCookieName = "X-Mon-Caveau-Auth"
 )
 
-func VerifyIfSessionExistsAndIsValid(sessionToken string) (bool, error) {
+func VerifyIfSessionExistsAndIsValid(sessionToken string) (bool, int, error) {
 	var exists bool
-	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM sessions WHERE session_token = ? AND expires_at > NOW())", sessionToken).Scan(&exists)
+	var userID int
+
+	err := db.QueryRow("SELECT EXISTS(SELECT 1 FROM sessions WHERE session_token = ? AND expires_at > NOW()), account_id FROM sessions WHERE session_token = ?", sessionToken, sessionToken).Scan(&exists, &userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return false, nil
+			return false, -1, nil
 		}
-		return false, err
+		return false, -1, err
 	}
 
-	return exists, nil
+	return exists, userID, nil
 }

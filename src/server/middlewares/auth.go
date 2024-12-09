@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	ContextIsLoggedIn = "UserIsLoggedIn"
+	ContextIsLoggedIn     = "UserIsLoggedIn"
+	ContextLoggedInUserId = "UserLoggedInUserId"
 )
 
 func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
@@ -28,10 +29,11 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 
 			sessionToken, err := c.Cookie(database.AuthCookieName)
 			if err == nil && sessionToken != "" {
-				validSessionToken, err := database.VerifyIfSessionExistsAndIsValid(sessionToken)
+				validSessionToken, userID, err := database.VerifyIfSessionExistsAndIsValid(sessionToken)
 				if err == nil && validSessionToken {
 					logger.Printf("Authenticated successfully for request (no hard check): %s", requestUrl)
 					c.Set(ContextIsLoggedIn, true)
+					c.Set(ContextLoggedInUserId, userID)
 				}
 			}
 
@@ -56,7 +58,7 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 			return
 		}
 
-		validSessionToken, err := database.VerifyIfSessionExistsAndIsValid(sessionToken)
+		validSessionToken, userID, err := database.VerifyIfSessionExistsAndIsValid(sessionToken)
 		if err != nil {
 			logger.Printf("Error during session token verification: %v\n", err)
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -77,6 +79,7 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 
 		logger.Printf("Authenticated successfully for request: %s", requestUrl)
 		c.Set(ContextIsLoggedIn, true)
+		c.Set(ContextLoggedInUserId, userID)
 		c.Next()
 	}
 }

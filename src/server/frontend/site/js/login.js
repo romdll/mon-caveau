@@ -22,7 +22,7 @@ function showLoggedInModal() {
 
         if (countdown <= 0) {
             clearInterval(countdownInterval);
-            window.location.replace("/dashboard");
+            window.location.replace("/v1/dashboard");
         }
     }, 1000);
 }

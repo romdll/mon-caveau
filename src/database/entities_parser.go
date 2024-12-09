@@ -105,7 +105,7 @@ func generateSQLInsertFromEntity(entity interface{}) (string, []interface{}, err
 	var values []interface{}
 
 	for field, value := range fieldsMap {
-		if field == "id" || field == "created_at" {
+		if field == "id" || field == "created_at" || value == "" {
 			continue
 		}
 

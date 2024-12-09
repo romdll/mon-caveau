@@ -3,57 +3,56 @@ document.getElementById('toggle-btn').addEventListener('click', function() {
     this.classList.toggle('open');
 });
 
-// Example content change based on sidebar selection
-document.getElementById('dashboardLink').addEventListener('click', function() {
-    setActiveMenu(this);
-    document.getElementById('contentArea').innerHTML = `
-        <h2>Bienvenue sur le Tableau de bord</h2>
-        <p>Voici les informations importantes sur votre caveau.</p>
-        <div class="example-data">
-            <h3>Exemple de données</h3>
-            <ul>
-                <li>Total de vins: 120</li>
-                <li>Total de vins dégustés: 75</li>
-                <li>Vins en attente de dégustation: 45</li>
-            </ul>
-        </div>
-    `;
-});
-
-document.getElementById('collectionLink').addEventListener('click', function() {
-    setActiveMenu(this);
-    document.getElementById('contentArea').innerHTML = `
-        <h2>Votre Collection de Vins</h2>
-        <p>Voici une vue détaillée de votre collection de vins.</p>
-        <div class="example-data">
-            <h3>Exemple de Collection</h3>
-            <ul>
-                <li>Vin 1: Bordeaux 2015</li>
-                <li>Vin 2: Champagne Brut 2018</li>
-                <li>Vin 3: Pinot Noir 2017</li>
-            </ul>
-        </div>
-    `;
-});
-
-document.getElementById('statsLink').addEventListener('click', function() {
-    setActiveMenu(this);
-    document.getElementById('contentArea').innerHTML = `
-        <h2>Statistiques</h2>
-        <p>Analyse des données de votre caveau.</p>
-        <div class="example-data">
-            <h3>Exemple de Statistiques</h3>
-            <ul>
-                <li>Vins par région: Bordeaux (50), Bourgogne (30), Champagne (20)</li>
-                <li>Vins par type: Rouge (60), Blanc (40), Rosé (20)</li>
-            </ul>
-        </div>
-    `;
-});
-
-// Function to set active menu item
 function setActiveMenu(selectedLink) {
     const items = document.querySelectorAll('.sidebar-item');
-    items.forEach(item => item.classList.remove('active')); // Remove active from all
-    selectedLink.classList.add('active'); // Add active to clicked link
+    items.forEach(item => item.classList.remove('active')); 
+    selectedLink.classList.add('active');
 }
+
+function showSection(sectionId) {
+    const sections = document.querySelectorAll('.content-section');
+    sections.forEach(section => {
+        if (section.id === sectionId) {
+            section.style.display = 'block'; 
+        } else {
+            section.style.display = 'none';
+        }
+    });
+}
+
+document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', async function() {
+        if (window.innerWidth <= 768) {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('toggle-btn').classList.remove('open');
+        }
+
+        document.getElementById('loadingOverlay').style.display = 'block';
+        document.getElementById('loadingIndicator').style.display = 'block';
+
+        console.log(this);
+
+        const sectionId = item.id.replace('Link', 'Content');
+        await fetchSpecificData(sectionId);
+
+        document.getElementById('loadingOverlay').style.display = 'none';
+        document.getElementById('loadingIndicator').style.display = 'none';
+
+        setActiveMenu(item);
+        showSection(sectionId);
+    });
+});
+
+async function fetchSpecificData(sectionId) {
+    switch(sectionId) {
+        case 'dashboardContent':
+            await SetupDashboardPage();
+            break;
+        case 'collectionContent':
+            break;
+        case 'statsContent':
+            break;
+    }
+}
+
+document.getElementById('dashboardLink').click();

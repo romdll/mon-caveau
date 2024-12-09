@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"moncaveau/database"
-	"moncaveau/database/crypt"
 	"moncaveau/server"
 	"moncaveau/utils"
 )
@@ -23,17 +21,17 @@ func main() {
 		logger.Fatalf("Failed to apply migrations: %v", err)
 	}
 
-	accountKey, err := crypt.GenerateSecureAccountKey()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// accountKey, err := crypt.GenerateSecureAccountKey()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	fmt.Println(accountKey)
-	acc := &database.Account{
-		AccountKey: accountKey,
-	}
+	// fmt.Println(accountKey)
+	// acc := &database.Account{
+	// 	AccountKey: accountKey,
+	// }
 
-	fmt.Println(database.InsertEntityById(acc))
+	// database.InsertEntityById(acc)
 
 	serverEngine := server.CreateServer()
 	utils.RunWithQuitNotification(serverEngine)

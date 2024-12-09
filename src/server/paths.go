@@ -1,10 +1,11 @@
 package server
 
 const (
-	ApiBase  = "/api"
-	ApiLogin = ApiBase + "/login"
+	ApiBase           = "/api"
+	ApiLogin          = ApiBase + "/login"
+	ApiWinesDashboard = ApiBase + "/wines/basic"
 
-	Frontend = "*filepath"
+	Frontend = "/v1/*filepath"
 )
 
 var (

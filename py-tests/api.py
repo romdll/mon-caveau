@@ -1,6 +1,6 @@
 import requests
 
-testAccountKey = "611580-570481-112069" # Mettre un compte de test
+testAccountKey = "418860-750366-546845" # Mettre un compte de test
 baseUrl = "http://localhost:80" # Mettre l'url de base
 with requests.Session() as session:
 
@@ -13,6 +13,6 @@ with requests.Session() as session:
 
     print(session.cookies)
 
-    test = session.get(baseUrl+"/api/test")
+    test = session.get(baseUrl+"/api/wines/basic")
     print(test)
     print(test.text)

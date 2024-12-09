@@ -8,15 +8,15 @@
     <title>Mon Caveau</title>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="/icon/favicon.ico">
-    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="/v1/icon/favicon.ico">
+    <link rel="stylesheet" href="/v1/css/dashboard.css">
 </head>
 
 <body>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="/images/logo.png" alt="Logo" class="sidebar-logo">
+            <img src="/v1/images/logo.png" alt="Logo" class="sidebar-logo">
         </div>
         <ul class="sidebar-menu">
             <li><a href="#" class="sidebar-item" id="dashboardLink"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
@@ -25,17 +25,108 @@
         </ul>
     </div>
 
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;"></div>
+
+    <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+        <img src="/v1/images/logo.png" alt="Loading..." class="loading-logo">
+        <span>Chargement...</span>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <button class="toggle-btn" id="toggle-btn"><i class="fas fa-bars"></i></button>
-        <div id="contentArea">
-            <!-- Content will be displayed based on the selected page -->
+        <div class="top-bar">
+            <button class="toggle-btn" id="toggle-btn">
+                <i class="fas fa-bars"></i> 
+            </button>
+            <span class="app-name">Mon Caveau</span>
+        </div>
+        
+        <div id="dashboardContent" class="content-section" style="display: none;">
             <h2>Bienvenue sur le Tableau de bord</h2>
             <p>Voici les informations importantes sur votre caveau.</p>
+            
+            <button id="addWineButton" class="add-wine-btn" onclick="addWine()"><i class="fa-solid fa-plus"></i></button>
+
+            <div class="stats-container">
+                <div class="stat-box">
+                    <h3>Total de Vins</h3>
+                    <p id="totalWines"></p>
+                </div>
+                <div class="stat-box">
+                    <h3>Total de Vins Vendues/Dégustés</h3>
+                    <p id="tastedWines"></p>
+                </div>
+                <div class="stat-box">
+                    <h3>Bouteilles Vendues/Dégustés ce Mois</h3>
+                    <p id="soldDrunkThisMonth"></p>
+                </div>
+            </div>
+            
+            <div class="graph-container">
+                <div class="graph-box">
+                    <h3>Répartition des Vins par Région</h3>
+                    <canvas id="regionChart"></canvas>
+                </div>
+                <div class="graph-box">
+                    <h3>Répartition des Vins par Type</h3>
+                    <canvas id="typeChart"></canvas>
+                </div>
+            </div>
+        
+            <div class="recent-transactions">
+                <h3>Transactions Récentes</h3>
+                <ul>
+                    <li class="transaction-item add">
+                        <span class="icon"><i class="fas fa-plus-circle"></i></span>
+                        <div class="transaction-info">
+                            <strong>1 bouteille</strong> de Bordeaux 2015 ajoutée (12/08/2024)
+                        </div>
+                    </li>
+                    <li class="transaction-item sell">
+                        <span class="icon"><i class="fas fa-minus-circle"></i></span>
+                        <div class="transaction-info">
+                            <strong>2 bouteilles</strong> de Champagne Brut 2018 vendues / dégustés (10/08/2024)
+                        </div>
+                    </li>
+                    <li class="transaction-item add">
+                        <span class="icon"><i class="fas fa-plus-circle"></i></span>
+                        <div class="transaction-info">
+                            <strong>3 bouteilles</strong> de Pinot Noir 2017 ajoutées (09/08/2024)
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="collectionContent" class="content-section" style="display: none;">
+            <h2>Votre Collection de Vins</h2>
+            <p>Voici une vue détaillée de votre collection de vins.</p>
+            <div class="example-data">
+                <h3>Exemple de Collection</h3>
+                <ul>
+                    <li>Vin 1: Bordeaux 2015</li>
+                    <li>Vin 2: Champagne Brut 2018</li>
+                    <li>Vin 3: Pinot Noir 2017</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="statsContent" class="content-section" style="display: none;">
+            <h2>Statistiques</h2>
+            <p>Analyse des données de votre caveau.</p>
+            <div class="example-data">
+                <h3>Exemple de Statistiques</h3>
+                <ul>
+                    <li>Vins par région: Bordeaux (50), Bourgogne (30), Champagne (20)</li>
+                    <li>Vins par type: Rouge (60), Blanc (40), Rosé (20)</li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <script src="/js/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/v1/js/dashboard_dashboard.js"></script>
+    <script src="/v1/js/dashboard.js"></script>
 </body>
 
 </html>
