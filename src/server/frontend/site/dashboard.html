@@ -64,12 +64,10 @@
             
             <div class="graph-container">
                 <div class="graph-box">
-                    <h3>Répartition des Vins par Région</h3>
-                    <canvas id="regionChart"></canvas>
+                    <div id="regionChart" class="chart-canvas"></div>
                 </div>
                 <div class="graph-box">
-                    <h3>Répartition des Vins par Type</h3>
-                    <canvas id="typeChart"></canvas>
+                    <div id="typeChart" class="chart-canvas"></div>
                 </div>
             </div>
         
@@ -125,6 +123,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
     <script src="/v1/js/dashboard_dashboard.js"></script>
     <script src="/v1/js/dashboard.js"></script>
 </body>

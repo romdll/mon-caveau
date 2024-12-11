@@ -30,8 +30,6 @@ document.querySelectorAll('.sidebar-item').forEach(item => {
         document.getElementById('loadingOverlay').style.display = 'block';
         document.getElementById('loadingIndicator').style.display = 'block';
 
-        console.log(this);
-
         const sectionId = item.id.replace('Link', 'Content');
         await fetchSpecificData(sectionId);
 

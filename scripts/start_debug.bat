@@ -6,7 +6,7 @@ set MON_CAVEAU_DB_HOST=host
 set MON_CAVEAU_DB_PORT=port
 set MON_CAVEAU_DB_NAME=name
 
-set DEBUG_MODE=false
+set DEBUG_MODE=true
 
 cd ../src/
 
