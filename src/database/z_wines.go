@@ -116,7 +116,6 @@ func GetWinesCountPerTypes(userId int) (map[string]int, error) {
 }
 
 func Get4LatestsTransactions(userId int) ([]WineTransaction, map[int]string, error) {
-	// SQL query to fetch the 4 latest transactions and the wine names
 	query := `
 		SELECT 
 			wine_transactions.id,

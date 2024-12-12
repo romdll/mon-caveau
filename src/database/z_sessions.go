@@ -6,6 +6,7 @@ import (
 
 const (
 	AuthCookieName = "X-Mon-Caveau-Auth"
+	IsCookieSecure = false
 )
 
 func VerifyIfSessionExistsAndIsValid(sessionToken string) (bool, int, error) {
@@ -21,4 +22,9 @@ func VerifyIfSessionExistsAndIsValid(sessionToken string) (bool, int, error) {
 	}
 
 	return exists, userID, nil
+}
+
+func DeleteSessionToken(sessionToken string) error {
+	_, err := db.Exec("DELETE FROM sessions WHERE session_token = ?", sessionToken)
+	return err
 }

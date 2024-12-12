@@ -1,7 +1,3 @@
-function addWine() {
-    alert('Fonction "Ajouter un Vin" activée. À implémenter plus tard!');
-}
-
 // Gets a bit lame colors and not easy to recognize
 function generateColorFromString(str) {
     let hash = 0;
@@ -24,6 +20,7 @@ async function SetupDashboardPage() {
 
     const winesCountPerRegions = json["winesCountPerRegions"];
     const winesCountPerTypes = json["winesCountPerTypes"];
+    const last4Transactions = json["last4Transactions"];
 
     document.getElementById("totalWines").innerText = json["totalWines"];
     document.getElementById("tastedWines").innerText = json["totalWinesDrankSold"];
@@ -146,4 +143,31 @@ async function SetupDashboardPage() {
 
     new ResizeObserver(() => regionChart.resize()).observe(regionChartElement);
     new ResizeObserver(() => typeChart.resize()).observe(typeChartElement);
+
+    const transactionContainer = document.querySelector('.recent-transactions ul');
+    transactionContainer.innerHTML = "";
+    if (last4Transactions["data"] && last4Transactions["data"].length > 0) {
+        last4Transactions["data"].forEach(transaction => {
+            const wineName = last4Transactions["wineIdToName"][transaction.wine_id];
+            
+            const transactionTypeClass = transaction.type === 'add' ? 'add' : 'sell';
+            const transactionIcon = transaction.type === 'add' ? 'fa-plus-circle' : 'fa-minus-circle';
+            
+            const transactionDate = new Date(transaction.date);
+            const formattedDate = transactionDate.toLocaleDateString("fr-FR");  
+    
+            const transactionHTML = `
+                <li class="transaction-item ${transactionTypeClass}">
+                    <span class="icon"><i class="fas ${transactionIcon}"></i></span>
+                    <div class="transaction-info">
+                        <strong>${transaction.quantity} bouteille${transaction.quantity > 1 ? 's' : ''}</strong> de ${wineName} ${transaction.type === 'add' ? 'ajoutée' : 'vendue / dégustée'} (${formattedDate})
+                    </div>
+                </li>
+            `;
+    
+            transactionContainer.innerHTML += transactionHTML;
+        });
+    } else {
+        transactionContainer.innerHTML = '<div class="no-data">Aucune transaction récente</div>';
+    }
 }

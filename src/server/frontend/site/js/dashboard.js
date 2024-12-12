@@ -50,6 +50,8 @@ async function fetchSpecificData(sectionId) {
             break;
         case 'statsContent':
             break;
+        case 'accountContent':
+            break;
     }
 }
 

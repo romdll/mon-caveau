@@ -19,9 +19,14 @@
             <img src="/v1/images/logo.png" alt="Logo" class="sidebar-logo">
         </div>
         <ul class="sidebar-menu">
-            <li><a href="#" class="sidebar-item" id="dashboardLink"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+            <li><a href="#" class="sidebar-item" id="dashboardLink"><i class="fas fa-tachometer-alt"></i> Tableau de
+                    bord</a></li>
             <li><a href="#" class="sidebar-item" id="collectionLink"><i class="fas fa-cocktail"></i> Collection</a></li>
             <li><a href="#" class="sidebar-item" id="statsLink"><i class="fas fa-chart-line"></i> Statistiques</a></li>
+            <li><a href="#" class="sidebar-item" id="accountLink"><i class="fas fa-user"></i> Paramètres</a></li>
+        </ul>
+        <ul class="sidebar-menu-bottom">
+            <li><a href="/v1/logout" class="logout" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a></li>
         </ul>
     </div>
 
@@ -32,20 +37,95 @@
         <span>Chargement...</span>
     </div>
 
+    <div id="addWineModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2>Ajouter un Vin</h2>
+            <div class="modal-options">
+                <button class="option-btn" id="createByHandBtn">Création Manuelle</button>
+                <button class="option-btn disabled" id="scanBottleBtn" disabled>Scanner la Bouteille (Dispo bientôt)</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="addHardWineModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModalFunc()">&times;</span>
+            <h2>Add Wine to Collection</h2>
+            <form id="wineForm" onsubmit="submitWineForm(event)">
+                <!-- Wine Name -->
+                <label for="wineName">Wine Name:</label>
+                <input type="text" id="wineName" name="wineName" required>
+
+                <!-- Domain (with autocomplete) -->
+                <label for="domain">Wine Domain:</label>
+                <input type="text" id="domain" name="domain" oninput="fetchDomains(this.value)"
+                    list="domainSuggestions">
+                <datalist id="domainSuggestions"></datalist>
+                <input type="hidden" id="newDomain" name="newDomain">
+
+                <!-- Region (with autocomplete) -->
+                <label for="region">Wine Region:</label>
+                <input type="text" id="region" name="region" oninput="fetchRegions(this.value)"
+                    list="regionSuggestions">
+                <datalist id="regionSuggestions"></datalist>
+                <input type="hidden" id="newRegion" name="newRegion">
+
+                <!-- Type (with autocomplete) -->
+                <label for="type">Wine Type:</label>
+                <input type="text" id="type" name="type" oninput="fetchTypes(this.value)" list="typeSuggestions">
+                <datalist id="typeSuggestions"></datalist>
+                <input type="hidden" id="newType" name="newType">
+
+                <!-- Bottle Size (with autocomplete) -->
+                <label for="bottleSize">Bottle Size:</label>
+                <input type="text" id="bottleSize" name="bottleSize" oninput="fetchBottleSizes(this.value)"
+                    list="bottleSizeSuggestions">
+                <datalist id="bottleSizeSuggestions"></datalist>
+                <input type="hidden" id="newBottleSize" name="newBottleSize">
+
+                <!-- Vintage -->
+                <label for="vintage">Vintage:</label>
+                <input type="number" id="vintage" name="vintage" min="1900" max="2100">
+
+                <!-- Quantity -->
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" min="1" required>
+
+                <!-- Buy Price -->
+                <label for="buyPrice">Buy Price:</label>
+                <input type="number" id="buyPrice" name="buyPrice" step="0.01">
+
+                <!-- Description -->
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="4"></textarea>
+
+                <!-- Image -->
+                <label for="image">Image URL:</label>
+                <input type="url" id="image" name="image">
+
+                <!-- Submit Button -->
+                <button type="submit">Add Wine</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
+
         <div class="top-bar">
             <button class="toggle-btn" id="toggle-btn">
-                <i class="fas fa-bars"></i> 
+                <i class="fas fa-bars"></i>
             </button>
             <span class="app-name">Mon Caveau</span>
         </div>
-        
+
         <div id="dashboardContent" class="content-section" style="display: none;">
-            <h2>Bienvenue sur le Tableau de bord</h2>
+            <h2>Tableau de bord</h2>
             <p>Voici les informations importantes sur votre caveau.</p>
-            
-            <button id="addWineButton" class="add-wine-btn" onclick="addWine()"><i class="fa-solid fa-plus"></i></button>
+
+            <button id="addWineButton" class="add-wine-btn" onclick="addWine()"><i
+                    class="fa-solid fa-plus"></i></button>
 
             <div class="stats-container">
                 <div class="stat-box">
@@ -61,7 +141,7 @@
                     <p id="soldDrunkThisMonth"></p>
                 </div>
             </div>
-            
+
             <div class="graph-container">
                 <div class="graph-box">
                     <div id="regionChart" class="chart-canvas"></div>
@@ -70,33 +150,17 @@
                     <div id="typeChart" class="chart-canvas"></div>
                 </div>
             </div>
-        
+
             <div class="recent-transactions">
                 <h3>Transactions Récentes</h3>
-                <ul>
-                    <li class="transaction-item add">
-                        <span class="icon"><i class="fas fa-plus-circle"></i></span>
-                        <div class="transaction-info">
-                            <strong>1 bouteille</strong> de Bordeaux 2015 ajoutée (12/08/2024)
-                        </div>
-                    </li>
-                    <li class="transaction-item sell">
-                        <span class="icon"><i class="fas fa-minus-circle"></i></span>
-                        <div class="transaction-info">
-                            <strong>2 bouteilles</strong> de Champagne Brut 2018 vendues / dégustés (10/08/2024)
-                        </div>
-                    </li>
-                    <li class="transaction-item add">
-                        <span class="icon"><i class="fas fa-plus-circle"></i></span>
-                        <div class="transaction-info">
-                            <strong>3 bouteilles</strong> de Pinot Noir 2017 ajoutées (09/08/2024)
-                        </div>
-                    </li>
-                </ul>
+                <ul></ul>
             </div>
         </div>
 
         <div id="collectionContent" class="content-section" style="display: none;">
+            <button id="addWineButton" class="add-wine-btn" onclick="addWine()"><i
+                    class="fa-solid fa-plus"></i></button>
+
             <h2>Votre Collection de Vins</h2>
             <p>Voici une vue détaillée de votre collection de vins.</p>
             <div class="example-data">
@@ -126,6 +190,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
     <script src="/v1/js/dashboard_dashboard.js"></script>
+    <script src="/v1/js/dashboard_add_wine.js"></script>
     <script src="/v1/js/dashboard.js"></script>
 </body>
 

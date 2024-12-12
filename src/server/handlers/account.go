@@ -70,7 +70,7 @@ func POST_VerifyAccountLogin(c *gin.Context) {
 				int(time.Until(expirationDate).Seconds()),
 				"/",
 				"",
-				false,
+				database.IsCookieSecure,
 				true,
 			)
 			c.JSON(http.StatusOK, gin.H{

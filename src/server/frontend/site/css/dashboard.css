@@ -18,10 +18,13 @@ body {
     left: 0;
     width: 250px;
     height: 100%;
-    background-color: #b85a5a; 
+    background-color: #b85a5a;
     transition: left 0.3s ease-in-out;
     z-index: 900;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .sidebar-header {
@@ -29,7 +32,7 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
-    background-color: #6a2e2e; 
+    background-color: #6a2e2e;
 }
 
 .sidebar-logo {
@@ -40,6 +43,7 @@ body {
 .sidebar-menu {
     list-style: none;
     padding: 20px 0;
+    margin: 0;
 }
 
 .sidebar-item {
@@ -56,23 +60,41 @@ body {
 }
 
 .sidebar-item.active {
-    background-color: #6a2e2e; 
+    background-color: #6a2e2e;
 }
 
 .sidebar-item i {
     margin-right: 10px;
 }
 
-/* Main Content */
+.sidebar-menu-bottom {
+    margin-top: auto;
+}
+
+.logout {
+    display: block;
+    padding: 15px 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    border-top: 1px solid #8b4d4d;
+    text-align: center;
+}
+
+.logout:hover {
+    background-color: #8b4d4d;
+}
+
+.logout i {
+    margin-right: 10px;
+}
+
 .main-content {
     margin-left: 250px;
     padding: 20px;
     width: 100%;
     transition: margin-left 0.3s;
-}
-
-.content-section {
-    /* TODO set some nice style */
 }
 
 .top-bar {
@@ -85,7 +107,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    z-index: 1002; 
+    z-index: 1002;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     display: none;
 }
@@ -184,7 +206,10 @@ body {
 
 .recent-transactions ul {
     list-style: none;
-    padding: 0;
+    padding: 11px 10px 1px 10px;
+    background-color: #eeeeee;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
 }
 
 .recent-transactions li {
@@ -203,22 +228,21 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Alternating Background Colors */
 .recent-transactions li:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-.transaction-item .icon  {
+.transaction-item .icon {
     font-size: 24px;
     margin-right: 15px;
 }
 
 .transaction-item.add .icon {
-    color: #4CAF50; 
+    color: #4CAF50;
 }
 
 .transaction-item.sell .icon {
-    color: #F44336; 
+    color: #F44336;
 }
 
 .transaction-info {
@@ -240,8 +264,23 @@ body {
     border-left: 5px solid #F44336;
 }
 
+.no-data {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-size: 16px;
+
+    align-items: center;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
 .add-wine-btn {
-    position: fixed; 
+    position: fixed;
     bottom: 30px;
     right: 30px;
     width: 50px;
@@ -257,7 +296,7 @@ body {
     justify-content: center;
     align-items: center;
     transition: background-color 0.3s ease;
-    z-index: 1002; 
+    z-index: 1002;
 }
 
 .add-wine-btn:hover {
@@ -280,9 +319,9 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); 
-    z-index: 9998; 
-    display: none; 
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    display: none;
 }
 
 .loading-indicator {
@@ -296,22 +335,149 @@ body {
 
 .loading-indicator img {
     width: 100px;
-    animation: rotateLogo 2s linear infinite; 
+    animation: rotateLogo 2s linear infinite;
 }
 
 .loading-indicator span {
     display: block;
     margin-top: 10px;
     font-size: 18px;
-    color: #fff; 
+    color: #fff;
 }
 
 @keyframes rotateLogo {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
+    }
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+    pointer-events: none;    
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.show {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal h2 {
+    color: #b85a5a;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 28px;
+    color: #b85a5a;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #8b4d4d;
+}
+
+.modal-options {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.option-btn {
+    padding: 12px 20px;
+    font-size: 16px;
+    background-color: #b85a5a;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.option-btn:hover {
+    background-color: #8b4d4d;
+}
+
+.option-btn.disabled {
+    background-color: #e0e0e0;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.modal {
+    label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+
+    input,
+    textarea,
+    select {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0 15px 0;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px 32px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -319,6 +485,7 @@ body {
     .sidebar {
         margin-top: 45px;
         left: -250px;
+        height: 94%;
     }
 
     .sidebar.active {
@@ -341,11 +508,11 @@ body {
     }
 
     .toggle-btn i {
-        transition: transform 0.3s ease; 
+        transition: transform 0.3s ease;
     }
-    
+
     .toggle-btn.open i {
-        transform: rotate(90deg); 
+        transform: rotate(-90deg);
     }
 
     .app-name {
@@ -353,13 +520,13 @@ body {
     }
 
     .graph-container {
-        flex-direction: column;  
-        gap: 10px; 
+        flex-direction: column;
+        gap: 10px;
     }
 
     .graph-box .chart-canvas {
         width: 100%;
-        height: 100%; 
+        height: 100%;
         height: 500px;
     }
 
@@ -370,7 +537,7 @@ body {
     }
 
     .stats-container {
-        grid-template-columns: 1fr; 
+        grid-template-columns: 1fr;
     }
 
     .stat-box {
@@ -379,7 +546,7 @@ body {
 
     .recent-transactions li {
         flex-direction: row;
-        justify-content: space-between; 
+        justify-content: space-between;
     }
 
     .transaction-item .icon {
@@ -390,23 +557,23 @@ body {
     .transaction-info {
         font-size: 14px;
         color: #555;
-        margin-top: 0; 
+        margin-top: 0;
     }
 
     .transaction-item.add .icon {
-        color: #4CAF50; 
+        color: #4CAF50;
     }
 
     .transaction-item.sell .icon {
-        color: #F44336; 
+        color: #F44336;
     }
 
     .add-wine-btn {
         font-size: 24px;
         width: 50px;
         height: 50px;
-        bottom: 30px; 
-        right: 30px; 
+        bottom: 30px;
+        right: 30px;
     }
 
     .add-wine-btn.show-text {
@@ -420,6 +587,14 @@ body {
 
     .add-wine-btn .text {
         display: inline-block;
+        font-size: 14px;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+
+    .option-btn {
         font-size: 14px;
     }
 }

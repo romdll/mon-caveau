@@ -21,6 +21,7 @@ func CreateServer() *gin.Engine {
 	// Attach handlers
 	// || Api
 	r.POST(ApiLogin, handlers.POST_VerifyAccountLogin)
+	r.GET(ApiLogout, handlers.GET_Logout)
 	r.GET(ApiWinesDashboard, handlers.GET_WinesDashboard)
 
 	// || Frontend

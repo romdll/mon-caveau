@@ -70,7 +70,7 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 		if !validSessionToken {
 			logger.Printf("Invalid session token for request: %s\n", requestUrl)
 
-			c.SetCookie(database.AuthCookieName, "", -1, "/", "", false, true)
+			c.SetCookie(database.AuthCookieName, "", -1, "/", "", database.IsCookieSecure, true)
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "Vous n'etes pas autorisé à accéder à cette page",
 			})
