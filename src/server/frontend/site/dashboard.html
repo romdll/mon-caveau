@@ -50,67 +50,75 @@
     
     <div id="addHardWineModal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModalFunc()">&times;</span>
-            <h2>Add Wine to Collection</h2>
+            <span class="close-btn" onclick="closeHardCreationModal()">&times;</span>
+            <h2>Ajouter un Vin à la Collection</h2>
             <form id="wineForm" onsubmit="submitWineForm(event)">
-                <!-- Wine Name -->
-                <label for="wineName">Wine Name:</label>
-                <input type="text" id="wineName" name="wineName" required>
-
-                <!-- Domain (with autocomplete) -->
-                <label for="domain">Wine Domain:</label>
-                <input type="text" id="domain" name="domain" oninput="fetchDomains(this.value)"
-                    list="domainSuggestions">
-                <datalist id="domainSuggestions"></datalist>
-                <input type="hidden" id="newDomain" name="newDomain">
-
-                <!-- Region (with autocomplete) -->
-                <label for="region">Wine Region:</label>
-                <input type="text" id="region" name="region" oninput="fetchRegions(this.value)"
-                    list="regionSuggestions">
-                <datalist id="regionSuggestions"></datalist>
-                <input type="hidden" id="newRegion" name="newRegion">
-
-                <!-- Type (with autocomplete) -->
-                <label for="type">Wine Type:</label>
-                <input type="text" id="type" name="type" oninput="fetchTypes(this.value)" list="typeSuggestions">
-                <datalist id="typeSuggestions"></datalist>
-                <input type="hidden" id="newType" name="newType">
-
-                <!-- Bottle Size (with autocomplete) -->
-                <label for="bottleSize">Bottle Size:</label>
-                <input type="text" id="bottleSize" name="bottleSize" oninput="fetchBottleSizes(this.value)"
-                    list="bottleSizeSuggestions">
-                <datalist id="bottleSizeSuggestions"></datalist>
-                <input type="hidden" id="newBottleSize" name="newBottleSize">
-
-                <!-- Vintage -->
-                <label for="vintage">Vintage:</label>
-                <input type="number" id="vintage" name="vintage" min="1900" max="2100">
-
-                <!-- Quantity -->
-                <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" name="quantity" min="1" required>
-
-                <!-- Buy Price -->
-                <label for="buyPrice">Buy Price:</label>
-                <input type="number" id="buyPrice" name="buyPrice" step="0.01">
-
-                <!-- Description -->
-                <label for="description">Description:</label>
-                <textarea id="description" name="description" rows="4"></textarea>
-
-                <!-- Image -->
-                <label for="image">Image URL:</label>
-                <input type="url" id="image" name="image">
-
-                <!-- Submit Button -->
-                <button type="submit">Add Wine</button>
+                <div class="input-item">
+                    <label for="wineName">Nom du Vin</label>
+                    <input type="text" id="wineName" name="wineName" required>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="domain">Domaine</label>
+                        <input type="text" id="domainInput" name="domain" oninput="fetchDomains(this.value)" aria-controls="domainSuggestions" onclick="fetchDomains(this.value)">
+                        <div id="domainSuggestions" class="suggestion-list"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="region">Région</label>
+                        <input type="text" id="regionInput" name="region" oninput="fetchRegions(this.value)" aria-controls="regionSuggestions", onclick="fetchRegions(this.value)">
+                        <div id="regionSuggestions" class="suggestion-list"></div>
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="type">Type de Vin</label>
+                        <input type="text" id="typeInput" name="type" oninput="fetchTypes(this.value)" aria-controls="typeSuggestions" onclick="fetchTypes(this.value)">
+                        <div id="typeSuggestions" class="suggestion-list"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="bottleSize">Taille de Bouteille</label>
+                        <input type="text" id="bottleSizeInput" name="bottleSize" oninput="fetchBottleSizes(this.value)" aria-controls="bottleSizeSuggestions" onclick="fetchBottleSizes(this.value)">
+                        <div id="bottleSizeSuggestions" class="suggestion-list"></div>
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="vintage">Millésime</label>
+                        <input type="number" id="vintage" name="vintage" min="1900" max="2100">
+                    </div>
+                    <div class="input-item">
+                        <label for="quantity">Quantité</label>
+                        <input type="number" id="quantity" name="quantity" min="1" required>
+                    </div>
+                </div>
+    
+                <button type="button" id="toggleMoreFieldsBtn" onclick="toggleMoreFields()">Informations supplémentaires &#x2193;</button>
+    
+                <div id="extraFields" style="display: none;">
+                    <div class="input-item">
+                        <label for="buyPrice">Prix d'Achat</label>
+                        <input type="number" id="buyPrice" name="buyPrice" step="0.01">
+                    </div>
+    
+                    <div class="input-item">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="4"></textarea>
+                    </div>
+    
+                    <div class="input-item">
+                        <label for="image">URL de l'Image</label>
+                        <input type="url" id="image" name="image" placeholder="https://exemple.com/image.jpg">
+                    </div>
+                </div>
+    
+                <button type="submit">Ajouter le Vin</button>
             </form>
         </div>
-    </div>
+    </div>    
 
-    <!-- Main Content -->
     <div class="main-content" id="mainContent">
 
         <div class="top-bar">
@@ -129,11 +137,11 @@
 
             <div class="stats-container">
                 <div class="stat-box">
-                    <h3>Total de Vins</h3>
+                    <h3>Total Bouteilles</h3>
                     <p id="totalWines"></p>
                 </div>
                 <div class="stat-box">
-                    <h3>Total de Vins Vendues/Dégustés</h3>
+                    <h3>Total bouteilles Vendues/Dégustés</h3>
                     <p id="tastedWines"></p>
                 </div>
                 <div class="stat-box">
