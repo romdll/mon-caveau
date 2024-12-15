@@ -28,31 +28,31 @@ type Session struct {
 type WineDomain struct {
 	DB_NAME string `db:"wine_domains"`
 
-	ID   int    `db:"id"`
-	Name string `db:"name"`
+	ID   int    `db:"id" json:"id,omitempty"`
+	Name string `db:"name" json:"name,omitempty"`
 }
 
 type WineRegion struct {
 	DB_NAME string `db:"wine_regions"`
 
-	ID      int    `db:"id"`
-	Name    string `db:"name"`
-	Country string `db:"country"`
+	ID      int    `db:"id" json:"id,omitempty"`
+	Name    string `db:"name" json:"name,omitempty"`
+	Country string `db:"country" json:"country,omitempty"`
 }
 
 type WineType struct {
 	DB_NAME string `db:"wine_types"`
 
-	ID   int    `db:"id"`
-	Name string `db:"name"`
+	ID   int    `db:"id" json:"id,omitempty"`
+	Name string `db:"name" json:"name,omitempty"`
 }
 
 type WineBottleSize struct {
 	DB_NAME string `db:"wine_bottle_sizes"`
 
-	ID   int     `db:"id"`
-	Size float64 `db:"size"`
-	Name float64 `db:"name"`
+	ID   int     `db:"id" json:"id,omitempty"`
+	Size float64 `db:"size" json:"size,omitempty"`
+	Name string  `db:"name" json:"name,omitempty"`
 }
 
 type WineWine struct {
@@ -60,7 +60,7 @@ type WineWine struct {
 
 	ID           int     `db:"id"`
 	Name         string  `db:"name"`
-	DomaineID    int     `db:"domaine_id"`
+	DomainID     int     `db:"domain_id"`
 	RegionID     int     `db:"region_id"`
 	TypeID       int     `db:"type_id"`
 	BottleSizeID int     `db:"bottle_size_id"`

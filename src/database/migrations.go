@@ -120,6 +120,20 @@ func ApplyMigrations() error {
 			`,
 			Version: 3.6,
 		},
+		{
+			SQL: `
+				ALTER TABLE wine_bottle_sizes
+				MODIFY COLUMN name VARCHAR(255) NOT NULL UNIQUE;
+			`,
+			Version: 4.1,
+		},
+		{
+			SQL: `
+				ALTER TABLE wine_wines
+				CHANGE COLUMN domaine_id domain_id INTEGER NOT NULL;
+			`,
+			Version: 4.2,
+		},
 	}
 
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version FLOAT PRIMARY KEY)`)
