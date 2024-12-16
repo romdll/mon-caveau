@@ -18,13 +18,17 @@ async function SetupDashboardPage() {
     const response = await fetch("/api/wines/basic");
     const json = await response.json();
 
+    if (json["error"]) {
+        const error = json["error"];
+    }
+
     const winesCountPerRegions = json["winesCountPerRegions"];
     const winesCountPerTypes = json["winesCountPerTypes"];
     const last4Transactions = json["last4Transactions"];
 
     document.getElementById("totalWines").innerText = json["totalWines"];
+    document.getElementById("addedWines").innerText = json["realTotalBottlesAdded"];
     document.getElementById("tastedWines").innerText = json["totalWinesDrankSold"];
-    document.getElementById("soldDrunkThisMonth").innerText = json["totalWinesDrankSoldThisMonth"];
 
     const regionData = Object.keys(winesCountPerRegions).map(region => ({
         name: region,
@@ -148,23 +152,38 @@ async function SetupDashboardPage() {
     transactionContainer.innerHTML = "";
     if (last4Transactions["data"] && last4Transactions["data"].length > 0) {
         last4Transactions["data"].forEach(transaction => {
-            const wineName = last4Transactions["wineIdToName"][transaction.wine_id];
-            
-            const transactionTypeClass = transaction.type === 'add' ? 'add' : 'sell';
-            const transactionIcon = transaction.type === 'add' ? 'fa-plus-circle' : 'fa-minus-circle';
-            
+            const wineName = last4Transactions["winesIdToName"][transaction.wine_id];
+
+            const transactionTypeClass = transaction.type === 'added' ? 'add' : 'sell';
+            const transactionIcon = transaction.type === 'added' ? 'fa-plus-circle' : 'fa-minus-circle';
+
             const transactionDate = new Date(transaction.date);
-            const formattedDate = transactionDate.toLocaleDateString("fr-FR");  
-    
+            const formattedDate = transactionDate.toLocaleString("fr-FR", {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false, 
+            });
+
+            const quantityWord = transaction.quantity > 1 ? 'bouteilles' : 'bouteille';
+            const actionWord = transaction.type === 'added'
+                ? (transaction.quantity > 1 ? 'ajoutées' : 'ajoutée')
+                : (transaction.type === 'sell' || transaction.type === 'sold' ? (transaction.quantity > 1 ? 'vendues' : 'vendue') : 'dégustée');
+
             const transactionHTML = `
                 <li class="transaction-item ${transactionTypeClass}">
                     <span class="icon"><i class="fas ${transactionIcon}"></i></span>
                     <div class="transaction-info">
-                        <strong>${transaction.quantity} bouteille${transaction.quantity > 1 ? 's' : ''}</strong> de ${wineName} ${transaction.type === 'add' ? 'ajoutée' : 'vendue / dégustée'} (${formattedDate})
+                        <strong>${transaction.quantity} ${quantityWord}</strong> de ${wineName} 
+                        ${actionWord} (${formattedDate})
                     </div>
                 </li>
             `;
-    
+
             transactionContainer.innerHTML += transactionHTML;
         });
     } else {

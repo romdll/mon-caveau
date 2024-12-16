@@ -73,11 +73,11 @@ type WineWine struct {
 }
 
 type WineTransaction struct {
-	DB_NAME string `db:"wine_transactions"`
+	DB_NAME string `db:"wine_transactions" json:"omitempty"`
 
-	ID       int       `db:"id"`
-	WineID   int       `db:"wine_id"`
-	Quantity int       `db:"quantity"`
-	Type     string    `db:"type"`
-	Date     time.Time `db:"date"`
+	ID       int       `db:"id" json:"id"`
+	WineID   int       `db:"wine_id" json:"wine_id"`
+	Quantity int       `db:"quantity" json:"quantity"`
+	Type     string    `db:"type" json:"type"`
+	Date     time.Time `db:"date" json:"date"`
 }

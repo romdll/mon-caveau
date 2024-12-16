@@ -22,7 +22,9 @@ func CreateServer() *gin.Engine {
 	// || Api
 	r.POST(ApiLogin, handlers.POST_VerifyAccountLogin)
 	r.GET(ApiLogout, handlers.GET_Logout)
+
 	r.GET(ApiWinesDashboard, handlers.GET_WinesDashboard)
+	r.POST(ApiWinesWineCreation, handlers.POST_CreateWine)
 
 	// || Frontend
 	r.GET(Frontend, frontend.ServeFrontendFiles)

@@ -3,10 +3,11 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"time"
 )
 
 func GetWinesForDashboard(userId int) (int, int, int, error) {
-	var totalWines, totalWinesDrankSold, totalWinesDrankSoldThisMonth sql.NullInt32
+	var totalWines, totalWinesDrankSold, totalBottlesAdded sql.NullInt32
 	query := `
 		SELECT 
 			(SELECT COUNT(*) 
@@ -18,19 +19,17 @@ func GetWinesForDashboard(userId int) (int, int, int, error) {
 			 AND wine_id IN (SELECT id FROM wine_wines WHERE account_id = ?)) AS total_wines_drank_sold,
 			(SELECT SUM(quantity) 
 			 FROM wine_transactions 
-			 WHERE type IN ('drank', 'sold') 
-			 AND wine_id IN (SELECT id FROM wine_wines WHERE account_id = ?) 
-			 AND YEAR(date) = YEAR(CURDATE()) 
-			 AND MONTH(date) = MONTH(CURDATE())) AS total_wines_drank_sold_this_month`
+			 WHERE type IN ('added') 
+			 AND wine_id IN (SELECT id FROM wine_wines WHERE account_id = ?)) AS total_bottles_added`
 
 	err := db.QueryRow(query, userId, userId, userId).
-		Scan(&totalWines, &totalWinesDrankSold, &totalWinesDrankSoldThisMonth)
+		Scan(&totalWines, &totalWinesDrankSold, &totalBottlesAdded)
 
 	if err != nil {
 		return 0, 0, 0, err
 	}
 
-	var realTotalWines, realTotalWinesDrankSold, realTotalWinesDrankSoldThisMonth = 0, 0, 0
+	var realTotalWines, realTotalWinesDrankSold, realTotalBottlesAdded = 0, 0, 0
 
 	if totalWines.Valid {
 		realTotalWines = int(totalWines.Int32)
@@ -38,18 +37,18 @@ func GetWinesForDashboard(userId int) (int, int, int, error) {
 	if totalWinesDrankSold.Valid {
 		realTotalWinesDrankSold = int(totalWinesDrankSold.Int32)
 	}
-	if totalWinesDrankSoldThisMonth.Valid {
-		realTotalWinesDrankSoldThisMonth = int(totalWinesDrankSoldThisMonth.Int32)
+	if totalBottlesAdded.Valid {
+		realTotalBottlesAdded = int(totalBottlesAdded.Int32)
 	}
 
-	return realTotalWines, realTotalWinesDrankSold, realTotalWinesDrankSoldThisMonth, nil
+	return realTotalWines, realTotalWinesDrankSold, realTotalBottlesAdded, nil
 }
 
 func GetWinesCountPerRegion(userId int) (map[string]int, error) {
 	query := `
 		SELECT
 			CONCAT(r.name, ' (', r.country, ')') AS region_name,
-			SUM(w.qantity) AS total_quantity
+			SUM(w.quantity) AS total_quantity
 		FROM wine_wines w
 		JOIN wine_regions r ON w.region_id = r.id
 		WHERE w.account_id = ?
@@ -84,7 +83,7 @@ func GetWinesCountPerTypes(userId int) (map[string]int, error) {
 	query := `
 		SELECT
 			wt.name AS wine_type, 
-			SUM(w.qantity) AS total_quantity
+			SUM(w.quantity) AS total_quantity
 		FROM wine_wines w
 		JOIN wine_types wt ON w.type_id = wt.id
 		WHERE w.account_id = ?
@@ -143,8 +142,17 @@ func Get4LatestsTransactions(userId int) ([]WineTransaction, map[int]string, err
 	for rows.Next() {
 		var transaction WineTransaction
 		var wineName string
-		if err := rows.Scan(&transaction.ID, &transaction.WineID, &transaction.Quantity, &transaction.Type, &transaction.Date, &wineName); err != nil {
+		var dateBytes []byte
+
+		if err := rows.Scan(&transaction.ID, &transaction.WineID, &transaction.Quantity, &transaction.Type, &dateBytes, &wineName); err != nil {
 			return nil, nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+
+		if len(dateBytes) > 0 {
+			transaction.Date, err = time.Parse(wineTransactionTimeFormat, string(dateBytes))
+			if err != nil {
+				return nil, nil, fmt.Errorf("failed to parse date: %w", err)
+			}
 		}
 
 		transactions = append(transactions, transaction)

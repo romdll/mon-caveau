@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"moncaveau/database"
+	"moncaveau/database/transformers"
 	"moncaveau/server/middlewares"
 	"net/http"
 
@@ -12,7 +13,7 @@ import (
 func GET_WinesDashboard(c *gin.Context) {
 	userId := c.GetInt(middlewares.ContextLoggedInUserId)
 
-	totalWines, totalWinesDrankSold, totalWinesDrankSoldThisMonth, err := database.GetWinesForDashboard(userId)
+	totalWines, totalWinesDrankSold, realTotalBottlesAdded, err := database.GetWinesForDashboard(userId)
 	if err != nil {
 		logger.Printf("Error when getting basic dashboard data: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -49,11 +50,11 @@ func GET_WinesDashboard(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"totalWines":                   totalWines,
-		"totalWinesDrankSold":          totalWinesDrankSold,
-		"totalWinesDrankSoldThisMonth": totalWinesDrankSoldThisMonth,
-		"winesCountPerRegions":         winesCountPerRegions,
-		"winesCountPerTypes":           winesCountPerTypes,
+		"totalWines":            totalWines,
+		"totalWinesDrankSold":   totalWinesDrankSold,
+		"realTotalBottlesAdded": realTotalBottlesAdded,
+		"winesCountPerRegions":  winesCountPerRegions,
+		"winesCountPerTypes":    winesCountPerTypes,
 		"last4Transactions": gin.H{
 			"data":          last4Transactions,
 			"winesIdToName": winesIdToName,
@@ -62,7 +63,7 @@ func GET_WinesDashboard(c *gin.Context) {
 }
 
 func POST_CreateWine(c *gin.Context) {
-	data := WineCreation{}
+	data := database.WineCreation{}
 	if err := c.BindJSON(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Le contenu de la requete est invalide.",
@@ -89,6 +90,11 @@ func POST_CreateWine(c *gin.Context) {
 
 		data.Domaine.ID = int(newId)
 	} else if data.Domaine.ID == 0 && data.Domaine.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni un nom de domaine invalide.",
+		})
+		return
+	} else if data.Domaine.ID < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Vous avez fourni un nom de domaine invalide.",
 		})
@@ -132,6 +138,11 @@ func POST_CreateWine(c *gin.Context) {
 			"error": "Vous avez fourni un nom de pays pour la région invalide.",
 		})
 		return
+	} else if data.Region.ID < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni un nom de region invalide.",
+		})
+		return
 	}
 
 	if data.Type.ID == 0 && data.Type.Name != "" {
@@ -157,6 +168,11 @@ func POST_CreateWine(c *gin.Context) {
 			"error": "Vous avez fourni un nom type de vin invalide.",
 		})
 		return
+	} else if data.Type.ID < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni un type de vin invalide.",
+		})
+		return
 	}
 
 	if data.BottleSize.ID == 0 && data.BottleSize.Name != "" && data.BottleSize.Size != 0 {
@@ -177,7 +193,7 @@ func POST_CreateWine(c *gin.Context) {
 		}
 
 		data.BottleSize.ID = int(newId)
-	} else if data.Region.ID == 0 && (data.BottleSize.Name != "" || data.BottleSize.Size != 0) {
+	} else if data.BottleSize.ID == 0 && (data.BottleSize.Name != "" || data.BottleSize.Size != 0) {
 		if data.BottleSize.Name != "" && data.BottleSize.Size != 0 {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "Vous avez fourni une taille de bouteille invalide.",
@@ -196,10 +212,21 @@ func POST_CreateWine(c *gin.Context) {
 			"error": "Vous avez fourni une taille de bouteille invalide.",
 		})
 		return
+	} else if data.BottleSize.ID < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni une taille de bouteille de vin invalide.",
+		})
+		return
 	}
 
-	fmt.Println(data)
-	// userId := c.GetInt(middlewares.ContextLoggedInUserId)
+	// TODO verify all the sub ids to make sure they exists
+
+	userId := c.GetInt(middlewares.ContextLoggedInUserId)
+	realWine := transformers.ToEntity(data)
+	realWine.AccountID = userId
+
+	_, err := database.InsertEntityById(realWine)
+	fmt.Println(err)
 }
 
 func GET_WinesBasicStats(c *gin.Context) {

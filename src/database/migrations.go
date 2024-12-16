@@ -134,6 +134,78 @@ func ApplyMigrations() error {
 			`,
 			Version: 4.2,
 		},
+		{
+			SQL: `
+				ALTER TABLE wine_wines
+				CHANGE COLUMN qantity quantity INTEGER NOT NULL;
+			`,
+			Version: 4.3,
+		},
+		{
+			SQL: `
+				ALTER TABLE wine_wines
+				MODIFY COLUMN buy_price REAL DEFAULT 0;
+			`,
+			Version: 4.4,
+		},
+		{
+			SQL: `
+				ALTER TABLE wine_wines
+				MODIFY COLUMN description VARCHAR(3000) DEFAULT '';
+			`,
+			Version: 4.5,
+		},
+		{
+			SQL: `
+				CREATE TRIGGER before_insert_wine_image
+				BEFORE INSERT ON wine_wines
+				FOR EACH ROW
+				BEGIN
+					IF NEW.image IS NULL THEN
+						SET NEW.image = '/v1/images/logo.png';
+					END IF;
+				END;
+			`,
+			Version: 4.6,
+		},
+		{
+			SQL: `
+				CREATE TRIGGER after_insert_wine
+				AFTER INSERT ON wine_wines
+				FOR EACH ROW
+				BEGIN
+					INSERT INTO wine_transactions (wine_id, quantity, type, date)
+					VALUES (NEW.id, NEW.quantity, 'added', UTC_TIMESTAMP(6));
+				END;
+			`,
+			Version: 5.1,
+		},
+		{
+			SQL: `
+				CREATE TRIGGER after_update_wine_quantity
+				AFTER UPDATE ON wine_wines
+				FOR EACH ROW
+				BEGIN
+					IF NEW.quantity > OLD.quantity THEN
+						INSERT INTO wine_transactions (wine_id, quantity, type, date)
+						VALUES (NEW.id, NEW.quantity - OLD.quantity, 'added', UTC_TIMESTAMP(6));
+					END IF;
+
+					IF NEW.quantity < OLD.quantity THEN
+						INSERT INTO wine_transactions (wine_id, quantity, type, date)
+						VALUES (NEW.id, OLD.quantity - NEW.quantity, 'drank', UTC_TIMESTAMP(6)); 
+					END IF;
+				END;
+			`,
+			Version: 5.2,
+		},
+		{
+			SQL: `
+				ALTER TABLE wine_transactions
+				MODIFY COLUMN date DATETIME(6) NOT NULL;
+			`,
+			Version: 5.3,
+		},
 	}
 
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version FLOAT PRIMARY KEY)`)
