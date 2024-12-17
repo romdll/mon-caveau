@@ -78,6 +78,18 @@ async function fetchRegions(query) {
     setActiveInput(document.getElementById("regionInput"));
 }
 
+async function fetchCountries(query) {
+    if (activeInput !== document.getElementById("countryInput") && suggestionList) {
+        suggestionList.style.display = 'none';
+    }
+
+    const bottleSizes = ['France', 'Espagne', 'Portugal'];
+    const suggestions = filterSuggestions(bottleSizes, query);
+
+    updateSuggestions('countrySuggestions', suggestions, query);
+    setActiveInput(document.getElementById("countryInput"));
+}
+
 async function fetchTypes(query) {
     if (activeInput !== document.getElementById("typeInput") && suggestionList) {
         suggestionList.style.display = 'none';

@@ -61,37 +61,49 @@
                 <div class="input-group">
                     <div class="input-item">
                         <label for="domain">Domaine</label>
-                        <input type="text" id="domainInput" name="domain" oninput="fetchDomains(this.value)" aria-controls="domainSuggestions" onclick="fetchDomains(this.value)">
+                        <input type="text" id="domainInput" name="domain" oninput="fetchDomains(this.value)" aria-controls="domainSuggestions" onclick="fetchDomains(this.value)" required>
                         <div id="domainSuggestions" class="suggestion-list"></div>
-                    </div>
-                    <div class="input-item">
-                        <label for="region">Région</label>
-                        <input type="text" id="regionInput" name="region" oninput="fetchRegions(this.value)" aria-controls="regionSuggestions", onclick="fetchRegions(this.value)">
-                        <div id="regionSuggestions" class="suggestion-list"></div>
                     </div>
                 </div>
     
                 <div class="input-group">
                     <div class="input-item">
-                        <label for="type">Type de Vin</label>
-                        <input type="text" id="typeInput" name="type" oninput="fetchTypes(this.value)" aria-controls="typeSuggestions" onclick="fetchTypes(this.value)">
-                        <div id="typeSuggestions" class="suggestion-list"></div>
+                        <label for="region">Région</label>
+                        <input type="text" id="regionInput" name="region" oninput="fetchRegions(this.value)" aria-controls="regionSuggestions", onclick="fetchRegions(this.value)" required>
+                        <div id="regionSuggestions" class="suggestion-list"></div>
                     </div>
                     <div class="input-item">
+                        <label for="country">Pays</label>
+                        <input type="text" id="countryInput" name="country" oninput="fetchCountries(this.value)" aria-controls="countrySuggestions", onclick="fetchCountries(this.value)" required>
+                        <div id="countrySuggestions" class="suggestion-list"></div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="type">Type de Vin</label>
+                        <input type="text" id="typeInput" name="type" oninput="fetchTypes(this.value)" aria-controls="typeSuggestions" onclick="fetchTypes(this.value)" required>
+                        <div id="typeSuggestions" class="suggestion-list"></div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-item">
                         <label for="bottleSize">Taille de Bouteille</label>
-                        <input type="text" id="bottleSizeInput" name="bottleSize" oninput="fetchBottleSizes(this.value)" aria-controls="bottleSizeSuggestions" onclick="fetchBottleSizes(this.value)">
+                        <input type="text" id="bottleSizeInput" name="bottleSize" oninput="fetchBottleSizes(this.value)" aria-controls="bottleSizeSuggestions" onclick="fetchBottleSizes(this.value)" required>
                         <div id="bottleSizeSuggestions" class="suggestion-list"></div>
                     </div>
+                    <!-- TODO put some other field to control the real size of the bottle as the input above is the "name" of the bottle size -->
                 </div>
     
                 <div class="input-group">
                     <div class="input-item">
                         <label for="vintage">Millésime</label>
-                        <input type="number" id="vintage" name="vintage" min="1900" max="2100">
+                        <input type="number" id="vintage" name="vintage" min="1900" max="2100" value="2000" required>
                     </div>
                     <div class="input-item">
                         <label for="quantity">Quantité</label>
-                        <input type="number" id="quantity" name="quantity" min="1" required>
+                        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
                     </div>
                 </div>
     
@@ -137,7 +149,7 @@
 
             <div class="stats-container">
                 <div class="stat-box">
-                    <h3>Nombre de Vins Uniques</h3>
+                    <h3>Nombre de Vins Uniques (Nombre de bouteilles)</h3>
                     <p id="totalWines"></p>
                 </div>
                 <div class="stat-box">

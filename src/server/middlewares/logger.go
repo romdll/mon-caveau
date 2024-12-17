@@ -15,8 +15,7 @@ func Logger() gin.HandlerFunc {
 		endTime := time.Now()
 		latency := endTime.Sub(startTime)
 
-		logger.Printf("%v | %3d | %13v | %15s | %-7s | %s\n",
-			endTime.Format("2006/01/02 - 15:04:05"),
+		logger.Printf("| %3d | %13v | %15s | %-7s | %s\n",
 			c.Writer.Status(),
 			latency,
 			c.ClientIP(),

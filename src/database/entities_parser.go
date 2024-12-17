@@ -177,3 +177,59 @@ func UpdateEntityById(entity interface{}) (sql.Result, error) {
 	logger.Println("Entity updated successfully.")
 	return result, nil
 }
+
+func GetAllEntities[T any]() ([]T, error) {
+	logger.Println("Fetching all entities from table...")
+
+	dbName, _, err := entityToMap(new(T))
+	if err != nil {
+		logger.Printf("Error in entityToMap: %v\n", err)
+		return nil, err
+	}
+
+	query := fmt.Sprintf("SELECT * FROM %s", dbName)
+
+	rows, err := db.Query(query)
+	if err != nil {
+		logger.Printf("Error executing SELECT query: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var entities []T
+
+	for rows.Next() {
+		newEntity := new(T)
+
+		var dest []interface{}
+
+		val := reflect.ValueOf(newEntity).Elem()
+		numFields := val.NumField()
+
+		for i := 0; i < numFields; i++ {
+			field := val.Type().Field(i)
+
+			if field.Name == "DB_NAME" {
+				continue
+			}
+
+			dest = append(dest, val.Field(i).Addr().Interface())
+		}
+
+		err := rows.Scan(dest...)
+		if err != nil {
+			logger.Printf("Error scanning row: %v\n", err)
+			return nil, err
+		}
+
+		entities = append(entities, *newEntity)
+	}
+
+	if err := rows.Err(); err != nil {
+		logger.Printf("Error during rows iteration: %v\n", err)
+		return nil, err
+	}
+
+	logger.Printf("Successfully fetched %d entities from the table %s.\n", len(entities), dbName)
+	return entities, nil
+}

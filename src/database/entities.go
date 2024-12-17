@@ -3,7 +3,7 @@ package database
 import "time"
 
 type Account struct {
-	DB_NAME string `db:"accounts"`
+	DB_NAME string `db:"accounts" json:"-"`
 
 	ID         int    `db:"id"`
 	AccountKey string `db:"account_key" json:"account_key,omitempty"`
@@ -15,7 +15,7 @@ type Account struct {
 }
 
 type Session struct {
-	DB_NAME string `db:"sessions"`
+	DB_NAME string `db:"sessions" json:"-"`
 
 	ID           int       `db:"id"`
 	AccountID    int       `db:"account_id"`
@@ -26,14 +26,14 @@ type Session struct {
 }
 
 type WineDomain struct {
-	DB_NAME string `db:"wine_domains"`
+	DB_NAME string `db:"wine_domains" json:"-"`
 
 	ID   int    `db:"id" json:"id,omitempty"`
 	Name string `db:"name" json:"name,omitempty"`
 }
 
 type WineRegion struct {
-	DB_NAME string `db:"wine_regions"`
+	DB_NAME string `db:"wine_regions" json:"-"`
 
 	ID      int    `db:"id" json:"id,omitempty"`
 	Name    string `db:"name" json:"name,omitempty"`
@@ -41,14 +41,14 @@ type WineRegion struct {
 }
 
 type WineType struct {
-	DB_NAME string `db:"wine_types"`
+	DB_NAME string `db:"wine_types" json:"-"`
 
 	ID   int    `db:"id" json:"id,omitempty"`
 	Name string `db:"name" json:"name,omitempty"`
 }
 
 type WineBottleSize struct {
-	DB_NAME string `db:"wine_bottle_sizes"`
+	DB_NAME string `db:"wine_bottle_sizes" json:"-"`
 
 	ID   int     `db:"id" json:"id,omitempty"`
 	Size float64 `db:"size" json:"size,omitempty"`
@@ -56,7 +56,7 @@ type WineBottleSize struct {
 }
 
 type WineWine struct {
-	DB_NAME string `db:"wine_wines"`
+	DB_NAME string `db:"wine_wines" json:"-"`
 
 	ID           int     `db:"id"`
 	Name         string  `db:"name"`
@@ -73,7 +73,7 @@ type WineWine struct {
 }
 
 type WineTransaction struct {
-	DB_NAME string `db:"wine_transactions" json:"omitempty"`
+	DB_NAME string `db:"wine_transactions" json:"-"`
 
 	ID       int       `db:"id" json:"id"`
 	WineID   int       `db:"wine_id" json:"wine_id"`

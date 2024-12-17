@@ -22,6 +22,19 @@ function showSection(sectionId) {
 
 document.querySelectorAll('.sidebar-item').forEach(item => {
     item.addEventListener('click', async function() {
+        // TODO ask the user if he is sure to quit while creating a wine
+        const addWineModal = document.getElementById("addWineModal");
+        const addHardWineModal = document.getElementById("addHardWineModal");
+        if (addWineModal.style.display === "flex"
+            || addHardWineModal.style.display === "flex"
+        ) {
+            if (addWineModal.style.display === "flex") {
+                hideWineAddOptionsModal();
+            } else {
+                closeHardCreationModal();
+            }
+        }
+
         if (window.innerWidth <= 768) {
             document.getElementById('sidebar').classList.remove('active');
             document.getElementById('toggle-btn').classList.remove('open');

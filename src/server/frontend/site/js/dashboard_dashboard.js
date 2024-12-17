@@ -26,7 +26,7 @@ async function SetupDashboardPage() {
     const winesCountPerTypes = json["winesCountPerTypes"];
     const last4Transactions = json["last4Transactions"];
 
-    document.getElementById("totalWines").innerText = json["totalWines"];
+    document.getElementById("totalWines").innerText = json["totalWines"] + " (" + json["totalCurrentBottles"] + ")";
     document.getElementById("addedWines").innerText = json["realTotalBottlesAdded"];
     document.getElementById("tastedWines").innerText = json["totalWinesDrankSold"];
 

@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func GetWinesForDashboard(userId int) (int, int, int, error) {
-	var totalWines, totalWinesDrankSold, totalBottlesAdded sql.NullInt32
+func GetWinesForDashboard(userId int) (int, int, int, int, error) {
+	var totalWines, totalWinesDrankSold, totalBottlesAdded, totalCurrentBottles sql.NullInt32
 	query := `
 		SELECT 
 			(SELECT COUNT(*) 
@@ -20,16 +20,17 @@ func GetWinesForDashboard(userId int) (int, int, int, error) {
 			(SELECT SUM(quantity) 
 			 FROM wine_transactions 
 			 WHERE type IN ('added') 
-			 AND wine_id IN (SELECT id FROM wine_wines WHERE account_id = ?)) AS total_bottles_added`
+			 AND wine_id IN (SELECT id FROM wine_wines WHERE account_id = ?)) AS total_bottles_added,
+			(SELECT SUM(quantity) FROM wine_wines WHERE account_id = ?) AS total_current_bottles`
 
-	err := db.QueryRow(query, userId, userId, userId).
-		Scan(&totalWines, &totalWinesDrankSold, &totalBottlesAdded)
+	err := db.QueryRow(query, userId, userId, userId, userId).
+		Scan(&totalWines, &totalWinesDrankSold, &totalBottlesAdded, &totalCurrentBottles)
 
 	if err != nil {
-		return 0, 0, 0, err
+		return 0, 0, 0, 0, err
 	}
 
-	var realTotalWines, realTotalWinesDrankSold, realTotalBottlesAdded = 0, 0, 0
+	var realTotalWines, realTotalWinesDrankSold, realTotalBottlesAdded, realTotalCurrentBottles = 0, 0, 0, 0
 
 	if totalWines.Valid {
 		realTotalWines = int(totalWines.Int32)
@@ -40,8 +41,11 @@ func GetWinesForDashboard(userId int) (int, int, int, error) {
 	if totalBottlesAdded.Valid {
 		realTotalBottlesAdded = int(totalBottlesAdded.Int32)
 	}
+	if totalCurrentBottles.Valid {
+		realTotalCurrentBottles = int(totalCurrentBottles.Int32)
+	}
 
-	return realTotalWines, realTotalWinesDrankSold, realTotalBottlesAdded, nil
+	return realTotalWines, realTotalWinesDrankSold, realTotalBottlesAdded, realTotalCurrentBottles, nil
 }
 
 func GetWinesCountPerRegion(userId int) (map[string]int, error) {
@@ -168,3 +172,7 @@ func Get4LatestsTransactions(userId int) ([]WineTransaction, map[int]string, err
 
 	return transactions, wineIdToName, nil
 }
+
+// func GetCountriesAndRegions() ([]WineRegion, error) {
+
+// }
