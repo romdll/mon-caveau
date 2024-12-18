@@ -42,7 +42,7 @@ async function SetupDashboardPage() {
 
     const regionChartOption = regionData.length > 0 ? {
         title: {
-            text: "Répartition des Vins par Région",
+            text: "Répartition des Bouteilles par Région",
             textStyle: {
                 color: '#000000'
             },
@@ -100,7 +100,7 @@ async function SetupDashboardPage() {
 
     const typeChartOption = typeData.length > 0 ? {
         title: {
-            text: "Répartition des Vins par Type",
+            text: "Répartition des Bouteilles par Type",
             textStyle: {
                 color: '#000000'
             },

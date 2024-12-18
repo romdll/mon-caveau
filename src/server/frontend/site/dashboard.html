@@ -26,7 +26,8 @@
             <li><a href="#" class="sidebar-item" id="accountLink"><i class="fas fa-user"></i> Paramètres</a></li>
         </ul>
         <ul class="sidebar-menu-bottom">
-            <li><a href="/v1/logout" class="logout" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a></li>
+            <li><a href="/v1/logout" class="logout" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Se
+                    déconnecter</a></li>
         </ul>
     </div>
 
@@ -43,11 +44,33 @@
             <h2>Ajouter un Vin</h2>
             <div class="modal-options">
                 <button class="option-btn" id="createByHandBtn">Création Manuelle</button>
-                <button class="option-btn disabled" id="scanBottleBtn" disabled>Scanner la Bouteille (Dispo bientôt)</button>
+                <button class="option-btn disabled" id="scanBottleBtn" disabled>Scanner la Bouteille (Dispo
+                    bientôt)</button>
             </div>
         </div>
     </div>
+
+    <div id="sizeInputModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeSizeInputModal()">&times;</span>
+            <h2>Enter Exact Bottle Size</h2>
+            <label for="preciseSizeInput">Bottle Size (ml):</label>
+            <input type="number" id="preciseSizeInput" value="1000" min="0" step="25"
+                oninput="updateSliderFromInput(this.value)">
+            <button onclick="updateBottleSize()">Confirm</button>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h2>Êtes-vous sûr de vouloir supprimer ce vin ?</h2>
+            <p>Cette action est irréversible.</p>
+            <button onclick="confirmDelete()">Oui</button>
+            <button onclick="closeDeleteModal()">Non</button>
+        </div>
+    </div>
     
+
     <div id="addHardWineModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeHardCreationModal()">&times;</span>
@@ -57,32 +80,36 @@
                     <label for="wineName">Nom du Vin</label>
                     <input type="text" id="wineName" name="wineName" required>
                 </div>
-    
+
                 <div class="input-group">
                     <div class="input-item">
                         <label for="domain">Domaine</label>
-                        <input type="text" id="domainInput" name="domain" oninput="fetchDomains(this.value)" aria-controls="domainSuggestions" onclick="fetchDomains(this.value)" required>
+                        <input type="text" id="domainInput" name="domain" oninput="fetchDomains(this.value)"
+                            aria-controls="domainSuggestions" onclick="fetchDomains(this.value)" required>
                         <div id="domainSuggestions" class="suggestion-list"></div>
                     </div>
                 </div>
-    
+
                 <div class="input-group">
                     <div class="input-item">
-                        <label for="region">Région</label>
-                        <input type="text" id="regionInput" name="region" oninput="fetchRegions(this.value)" aria-controls="regionSuggestions", onclick="fetchRegions(this.value)" required>
-                        <div id="regionSuggestions" class="suggestion-list"></div>
+                        <label for="country">Pays</label>
+                        <input type="text" id="countryInput" name="country" oninput="fetchCountries(this.value)"
+                            aria-controls="countrySuggestions" , onclick="fetchCountries(this.value)" required>
+                        <div id="countrySuggestions" class="suggestion-list"></div>
                     </div>
                     <div class="input-item">
-                        <label for="country">Pays</label>
-                        <input type="text" id="countryInput" name="country" oninput="fetchCountries(this.value)" aria-controls="countrySuggestions", onclick="fetchCountries(this.value)" required>
-                        <div id="countrySuggestions" class="suggestion-list"></div>
+                        <label for="region">Région</label>
+                        <input type="text" id="regionInput" name="region" oninput="fetchRegions(this.value)"
+                            aria-controls="regionSuggestions" , onclick="fetchRegions(this.value)" required>
+                        <div id="regionSuggestions" class="suggestion-list"></div>
                     </div>
                 </div>
 
                 <div class="input-group">
                     <div class="input-item">
                         <label for="type">Type de Vin</label>
-                        <input type="text" id="typeInput" name="type" oninput="fetchTypes(this.value)" aria-controls="typeSuggestions" onclick="fetchTypes(this.value)" required>
+                        <input type="text" id="typeInput" name="type" oninput="fetchTypes(this.value)"
+                            aria-controls="typeSuggestions" onclick="fetchTypes(this.value)" required>
                         <div id="typeSuggestions" class="suggestion-list"></div>
                     </div>
                 </div>
@@ -90,12 +117,21 @@
                 <div class="input-group">
                     <div class="input-item">
                         <label for="bottleSize">Taille de Bouteille</label>
-                        <input type="text" id="bottleSizeInput" name="bottleSize" oninput="fetchBottleSizes(this.value)" aria-controls="bottleSizeSuggestions" onclick="fetchBottleSizes(this.value)" required>
+                        <input type="text" id="bottleSizeInput" name="bottleSize" oninput="fetchBottleSizes(this.value)"
+                            aria-controls="bottleSizeSuggestions" onclick="fetchBottleSizes(this.value)" required>
                         <div id="bottleSizeSuggestions" class="suggestion-list"></div>
                     </div>
-                    <!-- TODO put some other field to control the real size of the bottle as the input above is the "name" of the bottle size -->
+                    <div class="input-item">
+                        <input type="hidden" id="bottleSizeValue" name="bottleSizeValue">
+
+                        <label for="bottleSizeSlider">Taille de Bouteille</label>
+                        <input type="range" id="bottleSizeSlider" min="0" max="18000" step="25" value="1000"
+                            oninput="updateSliderValue(this.value)">
+                        <label for="bottleSizeSlider" id="sliderValueLabel"
+                            onclick="openSizeInputModal()">1000ml</label>
+                    </div>
                 </div>
-    
+
                 <div class="input-group">
                     <div class="input-item">
                         <label for="vintage">Millésime</label>
@@ -106,30 +142,31 @@
                         <input type="number" id="quantity" name="quantity" min="1" value="1" required>
                     </div>
                 </div>
-    
-                <button type="button" id="toggleMoreFieldsBtn" onclick="toggleMoreFields()">Informations supplémentaires &#x2193;</button>
-    
+
+                <button type="button" id="toggleMoreFieldsBtn" onclick="toggleMoreFields()">Informations supplémentaires
+                    &#x2193;</button>
+
                 <div id="extraFields" style="display: none;">
                     <div class="input-item">
                         <label for="buyPrice">Prix d'Achat</label>
                         <input type="number" id="buyPrice" name="buyPrice" step="0.01">
                     </div>
-    
+
                     <div class="input-item">
                         <label for="description">Description</label>
                         <textarea id="description" name="description" rows="4"></textarea>
                     </div>
-    
+
                     <div class="input-item">
                         <label for="image">URL de l'Image</label>
                         <input type="url" id="image" name="image" placeholder="https://exemple.com/image.jpg">
                     </div>
                 </div>
-    
+
                 <button type="submit">Ajouter le Vin</button>
             </form>
         </div>
-    </div>    
+    </div>
 
     <div class="main-content" id="mainContent">
 
@@ -181,15 +218,13 @@
             <button id="addWineButton" class="add-wine-btn" onclick="addWine()"><i
                     class="fa-solid fa-plus"></i></button>
 
-            <h2>Votre Collection de Vins</h2>
-            <p>Voici une vue détaillée de votre collection de vins.</p>
-            <div class="example-data">
-                <h3>Exemple de Collection</h3>
-                <ul>
-                    <li>Vin 1: Bordeaux 2015</li>
-                    <li>Vin 2: Champagne Brut 2018</li>
-                    <li>Vin 3: Pinot Noir 2017</li>
-                </ul>
+            <h2>Collection de Vins</h2>
+            <div id="wine-collection">
+                <h3>Voici une vue détaillée de votre collection de vins.</h3>
+                <div id="wine-collection-list">
+                    <div class="wine-list"></div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
             </div>
         </div>
 
@@ -211,6 +246,7 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.0/dist/echarts.min.js"></script>
     <script src="/v1/js/dashboard_dashboard.js"></script>
     <script src="/v1/js/dashboard_add_wine.js"></script>
+    <script src="/v1/js/dashboard_collection.js"></script>
     <script src="/v1/js/dashboard.js"></script>
 </body>
 

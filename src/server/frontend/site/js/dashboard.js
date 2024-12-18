@@ -60,6 +60,7 @@ async function fetchSpecificData(sectionId) {
             await SetupDashboardPage();
             break;
         case 'collectionContent':
+            await SetupCollectionPage();
             break;
         case 'statsContent':
             break;
