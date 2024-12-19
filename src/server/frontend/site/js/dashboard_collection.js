@@ -1,16 +1,17 @@
 const allWines = [
-    { id: 1, name: "Bordeaux 2015", region: "Bordeaux", vintage: 2015, type: "Red", size: "750ml", quantity: 10 },
-    { id: 2, name: "Champagne Brut 2018", region: "Champagne", vintage: 2018, type: "Sparkling", size: "750ml", quantity: 8 },
-    { id: 3, name: "Pinot Noir 2017", region: "Burgundy", vintage: 2017, type: "Red", size: "375ml", quantity: 5 },
-    { id: 4, name: "Merlot 2016", region: "California", vintage: 2016, type: "Red", size: "750ml", quantity: 3 },
-    { id: 5, name: "Cabernet Sauvignon 2019", region: "California", vintage: 2019, type: "Red", size: "1500ml", quantity: 7 },
+    { id: 1, name: "Bordeaux 2015", region: "Bordeaux", vintage: 2015, type: "Red", size: "750ml", quantity: 10, image: "/v1/images/no_photo_generic.svg" },
+    { id: 2, name: "Champagne Brut 2018", region: "Champagne", vintage: 2018, type: "Sparkling", size: "750ml", quantity: 8, image: "https://via.placeholder.com/200" },
+    { id: 3, name: "Pinot Noir 2017", region: "Burgundy", vintage: 2017, type: "Red", size: "375ml", quantity: 5, image: "https://via.placeholder.com/200" },
+    { id: 4, name: "Merlot 2016", region: "California", vintage: 2016, type: "Red", size: "750ml", quantity: 3, image: "https://via.placeholder.com/200" },
+    { id: 5, name: "Cabernet Sauvignon 2019", region: "California", vintage: 2019, type: "Red", size: "1500ml", quantity: 7, image: "https://via.placeholder.com/200" },
 ];
 
+let filteredWines = [...allWines];
 const winesPerPage = 3;
 let currentPage = 1;
 let wineToDelete = null;
 
-async function SetupCollectionPage() {
+function SetupCollectionPage() {
     document.getElementById("collectionContent").style.display = "block";
     loadWines(currentPage);
     setupPagination();
@@ -19,7 +20,7 @@ async function SetupCollectionPage() {
 function loadWines(page) {
     const startIndex = (page - 1) * winesPerPage;
     const endIndex = startIndex + winesPerPage;
-    const winesToShow = allWines.slice(startIndex, endIndex);
+    const winesToShow = filteredWines.slice(startIndex, endIndex);
 
     const wineListContainer = document.querySelector('.wine-list');
     wineListContainer.innerHTML = '';
@@ -28,6 +29,7 @@ function loadWines(page) {
         const wineItem = document.createElement('div');
         wineItem.classList.add('wine-item');
         wineItem.innerHTML = `
+            <img src="${wine.image}" alt="${wine.name}">
             <h4>${wine.name} (${wine.vintage})</h4>
             <p><strong>Type:</strong> ${wine.type}</p>
             <p><strong>Region:</strong> ${wine.region}</p>
@@ -43,7 +45,7 @@ function loadWines(page) {
 }
 
 function setupPagination() {
-    const totalPages = Math.ceil(allWines.length / winesPerPage);
+    const totalPages = Math.ceil(filteredWines.length / winesPerPage);
     const paginationContainer = document.getElementById('pagination');
     paginationContainer.innerHTML = '';
 
@@ -68,15 +70,13 @@ function editWine(wineId) {
 function askDeleteWine(wineId) {
     wineToDelete = wineId;
     document.getElementById("deleteModal").style.display = "flex";
-    document.getElementById("deleteModal").style.opacity = '1';
-    document.getElementById("deleteModal").classList.add("show");
 }
 
 function confirmDelete() {
     if (wineToDelete !== null) {
-        const index = allWines.findIndex(w => w.id === wineToDelete);
+        const index = filteredWines.findIndex(w => w.id === wineToDelete);
         if (index !== -1) {
-            allWines.splice(index, 1); 
+            filteredWines.splice(index, 1);
             loadWines(currentPage);
             setupPagination();
         }
@@ -86,9 +86,18 @@ function confirmDelete() {
 }
 
 function closeDeleteModal() {
-    document.getElementById("deleteModal").classList.remove("show");
-    document.getElementById("deleteModal").style.opacity = '0';
-    setTimeout(() => {
-        document.getElementById("deleteModal").style.display = "none";
-    }, 300);   
+    document.getElementById("deleteModal").style.display = "none";
+}
+
+function searchWines() {
+    const searchTerm = document.getElementById("searchBar").value.toLowerCase();
+    filteredWines = allWines.filter(wine =>
+        wine.name.toLowerCase().includes(searchTerm) ||
+        wine.region.toLowerCase().includes(searchTerm) ||
+        wine.type.toLowerCase().includes(searchTerm) ||
+        wine.size.toLowerCase().includes(searchTerm)
+    );
+    currentPage = 1;  // Reset to the first page after search
+    loadWines(currentPage);
+    setupPagination();
 }

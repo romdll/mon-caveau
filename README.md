@@ -8,17 +8,17 @@
     - [X] Entities dynamic sql creation
         - [X] Avoid inserting an id when creating a new entity
 - [X] Server starter + logger + crash handler + quit handler
-- [ ] Authentification 
+- [X] Authentification 
 - [ ] Frontend
     - [X] Debug system with direct file access
     - [X] Release mode with no dependency (use embed.FS to keep files in memory (faster))
     - [X] Create the front page
     - [X] Create the login page 
     - [ ] Create the register page
-    - [ ] Wine dashboard page
-    - [ ] Wine dashboard/statistics page
+    - [X] Wine dashboard/dashboard page
     - [ ] Wine dashboard/collection page
-    - [ ] Wine dashboard/dashboard page
+    - [ ] Wine dashboard/statistics page
+    - [ ] Wine dashboard/account page
     - [ ] All the pages above should be nice to use either on phone and computer
 - [ ] Login / Register
     - [X] Database system
@@ -35,13 +35,13 @@
 - [ ] Wine collection system
     - [X] Basic database system 
     - [X] Wines linked to a user 
-    - [ ] We can add a new region
-    - [ ] We can add a new type of wine
-    - [ ] We can add a new domain
-    - [ ] We can add a new bottle size
+    - [X] We can add a new region
+    - [X] We can add a new type of wine
+    - [X] We can add a new domain
+    - [X] We can add a new bottle size
     - [ ] Allow all the adds above with verification by admin
     - [ ] Create statistics from the wines
-    - [ ] Allow kick modification of quantity
+    - [ ] Allow quick modification of quantity
     - [ ] Allow reusage of images of the same wine name for an other user
 - [ ] Wine rating system
     - [ ] Be able to rate a wine very fast and easly

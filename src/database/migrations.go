@@ -206,6 +206,19 @@ func ApplyMigrations() error {
 			`,
 			Version: 5.3,
 		},
+		{
+			SQL: `
+				CREATE TRIGGER before_insert_wine_image
+				BEFORE INSERT ON wine_wines
+				FOR EACH ROW
+				BEGIN
+					IF NEW.image IS NULL THEN
+						SET NEW.image = '/v1/images/no_photo_generic.svg';
+					END IF;
+				END;
+			`,
+			Version: 5.4,
+		},
 	}
 
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version FLOAT PRIMARY KEY)`)

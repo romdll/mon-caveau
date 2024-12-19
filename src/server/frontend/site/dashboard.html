@@ -215,10 +215,12 @@
         </div>
 
         <div id="collectionContent" class="content-section" style="display: none;">
-            <button id="addWineButton" class="add-wine-btn" onclick="addWine()"><i
-                    class="fa-solid fa-plus"></i></button>
-
+            <button id="addWineButton" class="add-wine-btn" onclick="addWine()"><i class="fa-solid fa-plus"></i></button>
+            
             <h2>Collection de Vins</h2>
+        
+            <input type="text" id="searchBar" class="search-bar" placeholder="Rechercher un vin..." oninput="searchWines()">
+        
             <div id="wine-collection">
                 <h3>Voici une vue détaillée de votre collection de vins.</h3>
                 <div id="wine-collection-list">
