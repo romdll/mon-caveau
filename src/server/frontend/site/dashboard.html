@@ -53,23 +53,30 @@
     <div id="sizeInputModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeSizeInputModal()">&times;</span>
-            <h2>Enter Exact Bottle Size</h2>
-            <label for="preciseSizeInput">Bottle Size (ml):</label>
-            <input type="number" id="preciseSizeInput" value="1000" min="0" step="25"
-                oninput="updateSliderFromInput(this.value)">
-            <button onclick="updateBottleSize()">Confirm</button>
+            <h2>Taille Exacte De Bouteille</h2>
+            <div class="input-item">
+                <label for="preciseSizeInput">Taille de Bouteille en ml</label>
+                <input type="number" id="preciseSizeInput" value="1000" min="0" step="25"
+                    oninput="updateSliderFromInput(this.value)">
+                <button type="custom" onclick="updateBottleSize()">Valider</button>
+            </div>
         </div>
     </div>
 
     <div id="deleteModal" class="modal">
         <div class="modal-content">
             <h2>Êtes-vous sûr de vouloir supprimer ce vin ?</h2>
-            <p>Cette action est irréversible.</p>
-            <button onclick="confirmDelete()">Oui</button>
-            <button onclick="closeDeleteModal()">Non</button>
+            <div class="input-group">
+                <div class="input-item">
+                    <button type="deletionYes" onclick="confirmDelete()">Oui</button>
+                </div>
+                <div class="input-item">
+                    <button type="deletionNo" onclick="closeDeleteModal()">Non</button>
+                </div>
+            </div>
+            <p id="semi-footer">Cette action est irréversible.</p>
         </div>
     </div>
-    
 
     <div id="addHardWineModal" class="modal">
         <div class="modal-content">
@@ -215,14 +222,15 @@
         </div>
 
         <div id="collectionContent" class="content-section" style="display: none;">
-            <button id="addWineButton" class="add-wine-btn" onclick="addWine()"><i class="fa-solid fa-plus"></i></button>
-            
+            <button id="addWineButton" class="add-wine-btn" onclick="addWine()"><i
+                    class="fa-solid fa-plus"></i></button>
+
             <h2>Collection de Vins</h2>
-        
-            <input type="text" id="searchBar" class="search-bar" placeholder="Rechercher un vin..." oninput="searchWines()">
-        
+
             <div id="wine-collection">
                 <h3>Voici une vue détaillée de votre collection de vins.</h3>
+                <input type="text" id="searchBar" class="search-bar" placeholder="Rechercher un vin..."
+                    oninput="searchWines()">
                 <div id="wine-collection-list">
                     <div class="wine-list"></div>
                     <div class="pagination" id="pagination"></div>

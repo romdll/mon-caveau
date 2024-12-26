@@ -219,7 +219,7 @@ function filterSuggestions(allSuggestions, query) {
     if (!query || query && query === "") {
         return allSuggestions;
     }
-    return allSuggestions.filter(data => data.includes(query));
+    return allSuggestions.filter(data => data.toLowerCase().includes(query.toLowerCase()));
 }
 
 function highlightMatch(suggestion, query) {

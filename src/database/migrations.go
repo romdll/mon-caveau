@@ -207,6 +207,10 @@ func ApplyMigrations() error {
 			Version: 5.3,
 		},
 		{
+			SQL:     `DROP TRIGGER before_insert_wine_image;`,
+			Version: 5.4,
+		},
+		{
 			SQL: `
 				CREATE TRIGGER before_insert_wine_image
 				BEFORE INSERT ON wine_wines
@@ -217,7 +221,7 @@ func ApplyMigrations() error {
 					END IF;
 				END;
 			`,
-			Version: 5.4,
+			Version: 5.5,
 		},
 	}
 

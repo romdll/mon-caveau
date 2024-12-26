@@ -31,6 +31,7 @@ func CreateServer() *gin.Engine {
 	r.GET(ApiWinesFetchTypes, handlers.GET_GetWineTypes)
 	r.GET(ApiWinesFetchBottleSizes, handlers.GET_GetBottleSizes)
 	r.GET(ApiWinesFetchDomains, handlers.GET_GetDomains)
+	r.GET(ApiWinesFetchPaginated, handlers.GET_allWines)
 
 	// || Wines
 	r.POST(ApiWinesWineCreation, handlers.POST_CreateWine)

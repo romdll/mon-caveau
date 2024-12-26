@@ -460,6 +460,73 @@ body {
     transition: border-color 0.3s ease;
 }
 
+.modal button[type="custom"] {
+    padding: 14px 24px;
+    background-color: #b85a5a;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 50%;
+}
+
+.modal button[type="custom"]:hover {
+    background-color: #8b4d4d;
+}
+
+.modal button[type="deletionYes"] {
+    padding: 14px 24px;
+    background-color: #3ab53e;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.modal button[type="deletionYes"]:hover {
+    background-color: #268429;
+}
+
+.modal button[type="deletionNo"] {
+    padding: 14px 24px;
+    background-color: #bb3d34;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.modal button[type="deletionNo"]:hover {
+    background-color: #9c3129;
+}
+
+#semi-footer {
+    font-size: 0.9rem;
+    color: rgba(0, 0, 0, 0.5);
+    font-style: italic;
+    text-align: center;
+    margin-top: 20px;
+    transition: color 0.3s ease-in-out;
+}
+
+#semi-footer:hover {
+    color: rgba(0, 0, 0, 0.8);
+}
+
 .modal input[type="text"]:focus,
 .modal input[type="number"]:focus,
 .modal input[type="url"]:focus,
@@ -620,13 +687,17 @@ body {
 }
 
 .wine-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
-    margin-top: 20px;
+    justify-content: flex-start; 
+    padding: 20px;
 }
 
 .wine-item {
+    flex: 1 1 calc(25% - 20px); 
+    max-width: calc(25% - 20px);
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     background-color: #fff;
@@ -709,21 +780,154 @@ body {
     background-color: #0056b3;
 }
 
-#wine-collection {
-    margin-top: 20px;
+.pagination button.active {
+    background-color: #0056b3;
+    font-weight: bold;
 }
 
-#wine-collection-list {
-    background-color: #eeeeee;
-    border: 1px solid #e1e1e1;
-    border-radius: 10px;
+.wine-item .highlight {
+    background-color: yellow;
+    font-weight: bold;
+} 
+
+#pagination {
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.9);
     padding: 10px;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ellipsis {
+    margin: 0 5px;
+    font-size: 16px;
+    color: #555;
+}
+
+#pagination button {
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+#pagination button.active {
+    background-color: #0056b3;
+}
+
+#pagination button:hover {
+    background-color: #0056b3;
+}
+
+#wine-collection {
+    margin-top: 10px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    width: 100%; 
 }
 
 #wine-collection h3 {
-    font-size: 24px;
+    text-align: center;
+}
+
+.loading-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    max-width: 200px;
+    width: 100%;
+}
+
+.loading-placeholder-text {
+    width: 80%;
+    height: 14px;
+    background-color: #ddd;
+    border-radius: 4px;
+    animation: shimmer 1.5s infinite;
+}
+
+.wine-info {
+    font-family: 'Roboto', Arial, sans-serif;
     color: #333;
-    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    margin-bottom: 10px;
+}
+
+.wine-info h4 {
+    font-size: 1.25rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.wine-info p {
+    font-size: 0.95rem;
+    margin: 5px 0;
+    line-height: 1.5;
+}
+
+.wine-info strong {
+    color: #7f8c8d;
+    font-weight: 600;
+}
+
+.wine-info:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.wine-info-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.wine-info-actions button {
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.wine-info-actions button:hover {
+    background-color: #2980b9;
+}
+
+.wine-info-actions .delete {
+    background-color: #e74c3c;
+}
+
+.wine-info-actions .delete:hover {
+    background-color: #c0392b;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -100%;
+    }
+    100% {
+        background-position: 200%;
+    }
 }
 
 @keyframes fadeIn {
@@ -866,16 +1070,38 @@ body {
     }
 
     .wine-list {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (max-width: 480px) {
-    .wine-list {
-        grid-template-columns: 1fr;
-    }
-
-    .pagination {
+        display: flex;
         flex-direction: column;
+        gap: 10px; 
+        padding: 10px; 
+    }
+
+    .wine-item {
+        flex: 1 1 auto;
+        max-width: 100%;
+        padding: 15px; 
+        border-radius: 8px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .wine-item img {
+        max-width: 100%; 
+        height: auto;
+        border-radius: 4px; 
+        margin-bottom: 10px; 
+    }
+
+    .wine-info {
+        text-align: left;
+    }
+
+    .wine-item-actions {
+        display: flex;
+        justify-content: space-between; 
+        gap: 10px;
+    }
+
+    html {
+        scroll-behavior: smooth;
     }
 }

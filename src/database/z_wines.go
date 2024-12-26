@@ -6,6 +6,27 @@ import (
 	"time"
 )
 
+func GetUserWinesCount(userId int) (int, error) {
+	var userWinesCount sql.NullInt32
+	query := `
+		SELECT COUNT(*) 
+		FROM wine_wines 
+		WHERE account_id = ?
+	`
+
+	err := db.QueryRow(query, userId).Scan(&userWinesCount)
+	if err != nil {
+		return 0, err
+	}
+
+	var realUserWinesCount = 0
+	if userWinesCount.Valid {
+		realUserWinesCount = int(userWinesCount.Int32)
+	}
+
+	return realUserWinesCount, nil
+}
+
 func GetWinesForDashboard(userId int) (int, int, int, int, error) {
 	var totalWines, totalWinesDrankSold, totalBottlesAdded, totalCurrentBottles sql.NullInt32
 	query := `
@@ -172,7 +193,3 @@ func Get4LatestsTransactions(userId int) ([]WineTransaction, map[int]string, err
 
 	return transactions, wineIdToName, nil
 }
-
-// func GetCountriesAndRegions() ([]WineRegion, error) {
-
-// }

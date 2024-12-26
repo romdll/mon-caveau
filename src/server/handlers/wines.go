@@ -6,6 +6,7 @@ import (
 	"moncaveau/database/transformers"
 	"moncaveau/server/middlewares"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -230,10 +231,46 @@ func POST_CreateWine(c *gin.Context) {
 	fmt.Println(err)
 }
 
-func GET_WinesBasicStats(c *gin.Context) {
+func GET_allWines(c *gin.Context) {
+	userId := c.GetInt(middlewares.ContextLoggedInUserId)
 
-}
+	pageParam := c.DefaultQuery("page", "1")
+	limitParam := c.DefaultQuery("limit", "3")
 
-func GET_WinesFullStats(c *gin.Context) {
+	page, err := strconv.Atoi(pageParam)
+	if err != nil || page < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Paramètre 'page' invalide.",
+		})
+		return
+	}
 
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil || limit < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Paramètre 'limit' invalide.",
+		})
+		return
+	}
+
+	wines, err := database.GetUserEntitiesWithPagination[database.WineWine](limit, page, userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Erreur interne lors de la recupération de vos vins.",
+		})
+		return
+	}
+
+	winesCount, err := database.GetUserWinesCount(userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Erreur interne lors de la recupération du nombre de vins que vous possédez.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"wines": wines,
+		"total": winesCount,
+	})
 }

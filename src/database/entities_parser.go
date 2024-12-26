@@ -187,9 +187,67 @@ func GetAllEntities[T any]() ([]T, error) {
 		return nil, err
 	}
 
-	query := fmt.Sprintf("SELECT * FROM %s", dbName)
+	rows, err := db.Query("SELECT * FROM " + dbName)
+	if err != nil {
+		logger.Printf("Error executing SELECT query: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
 
-	rows, err := db.Query(query)
+	var entities []T
+
+	for rows.Next() {
+		newEntity := new(T)
+
+		var dest []interface{}
+
+		val := reflect.ValueOf(newEntity).Elem()
+		numFields := val.NumField()
+
+		for i := 0; i < numFields; i++ {
+			field := val.Type().Field(i)
+
+			if field.Name == "DB_NAME" {
+				continue
+			}
+
+			dest = append(dest, val.Field(i).Addr().Interface())
+		}
+
+		err := rows.Scan(dest...)
+		if err != nil {
+			logger.Printf("Error scanning row: %v\n", err)
+			return nil, err
+		}
+
+		entities = append(entities, *newEntity)
+	}
+
+	if err := rows.Err(); err != nil {
+		logger.Printf("Error during rows iteration: %v\n", err)
+		return nil, err
+	}
+
+	logger.Printf("Successfully fetched %d entities from the table %s.\n", len(entities), dbName)
+	return entities, nil
+}
+
+func GetUserEntitiesWithPagination[T any](limit, page, userId int) ([]T, error) {
+	if limit <= 0 || page <= 0 {
+		return nil, fmt.Errorf("invalid limit or page: both must be greater than zero")
+	}
+
+	logger.Printf("Fetching entities from table with limit %d and page %d...\n", limit, page)
+
+	dbName, _, err := entityToMap(new(T))
+	if err != nil {
+		logger.Printf("Error in entityToMap: %v\n", err)
+		return nil, err
+	}
+
+	queryBase := "SELECT * FROM " + dbName + " WHERE account_id = ? LIMIT ? OFFSET ?"
+	offset := (page - 1) * limit
+	rows, err := db.Query(queryBase, userId, limit, offset)
 	if err != nil {
 		logger.Printf("Error executing SELECT query: %v\n", err)
 		return nil, err

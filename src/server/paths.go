@@ -10,6 +10,7 @@ const (
 	ApiWinesFetchTypes            = ApiBase + "/wines/types"
 	ApiWinesFetchBottleSizes      = ApiBase + "/wines/bottles/sizes"
 	ApiWinesFetchDomains          = ApiBase + "/wines/domains"
+	ApiWinesFetchPaginated        = ApiBase + "/wines"
 
 	Frontend    = "/v1/*filepath"
 	Favicon     = "/favicon.ico"
