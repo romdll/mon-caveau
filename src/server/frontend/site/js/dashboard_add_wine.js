@@ -103,7 +103,7 @@ async function fetchDomains(query) {
         suggestionList.style.display = 'none';
     }
 
-    const domains = jsonDomains.map(item => item.name);
+    const domains = jsonDomains ? jsonDomains.map(item => item.name) : [];
     const suggestions = filterSuggestions(domains, query);
 
     updateSuggestions('domainSuggestions', suggestions, query);
@@ -115,10 +115,10 @@ async function fetchRegions(query) {
         suggestionList.style.display = 'none';
     }
 
-    const regionsWithCountries = jsonRegionCountries.map(item => ({
+    const regionsWithCountries = jsonRegionCountries ? jsonRegionCountries.map(item => ({
         region: item.name,
         country: item.country
-    }));
+    })) : [];
 
     const regionCountrySuggestions = regionsWithCountries.map(item => `${item.region} - ${item.country}`);
 
@@ -134,7 +134,7 @@ function selectRegion(regionWithCountry) {
     selectedRegion = region;
     document.getElementById("regionInput").value = region;
 
-    const availableCountries = jsonRegionCountries.filter(item => item.name === region);
+    const availableCountries = jsonRegionCountries ? jsonRegionCountries.filter(item => item.name === region) : [];
     if (availableCountries.length === 1) {
         selectedCountry = availableCountries[0].country;
         document.getElementById("countryInput").value = selectedCountry;
@@ -150,7 +150,7 @@ async function fetchCountries(query) {
         suggestionList.style.display = 'none';
     }
 
-    const countries = [...new Set(jsonRegionCountries.map(item => item.country))];
+    const countries = jsonRegionCountries ? [...new Set(jsonRegionCountries.map(item => item.country))] : [];
     const suggestions = filterSuggestions(countries, query);
 
     updateSuggestions('countrySuggestions', suggestions, query);
@@ -171,7 +171,7 @@ async function fetchTypes(query) {
         suggestionList.style.display = 'none';
     }
 
-    const types = jsonTypes.map(item => item.name);
+    const types = jsonTypes ? jsonTypes.map(item => item.name) : [];
     const suggestions = filterSuggestions(types, query);
 
     updateSuggestions('typeSuggestions', suggestions, query);
@@ -183,7 +183,7 @@ async function fetchBottleSizes(query) {
         suggestionList.style.display = 'none';
     }
 
-    const bottleSizes = jsonBottleSizes.map(item => ({ name: item.name, size: item.size }));
+    const bottleSizes = jsonBottleSizes ? jsonBottleSizes.map(item => ({ name: item.name, size: item.size })) : [];
 
     const suggestions = filterSuggestions(bottleSizes.map(item => `${item.name} (${item.size}ml)`), query);
 
@@ -337,7 +337,7 @@ function updateBottleSize() {
 
 function getDomainData() {
     const domainName = document.getElementById('domainInput').value;
-    const domain = jsonDomains.find(item => item.name === domainName);
+    const domain = jsonDomains ? jsonDomains.find(item => item.name === domainName) : null;
     return domain ? { "id": domain.id } : { "name": domainName };
 }
 
@@ -345,7 +345,7 @@ function getRegionData() {
     const regionName = document.getElementById('regionInput').value;
     const countryName = document.getElementById('countryInput').value;
 
-    if (regionName && countryName) {
+    if (regionName && countryName && jsonRegionCountries) {
         const region = jsonRegionCountries.find(item => item.name === regionName && item.country === countryName);
         return region ? { "id": region.id } : { "name": regionName, "country": countryName }; 
     }
@@ -354,14 +354,14 @@ function getRegionData() {
 
 function getTypeData() {
     const typeName = document.getElementById('typeInput').value;
-    const type = jsonTypes.find(item => item.name === typeName);
+    const type = jsonTypes ? jsonTypes.find(item => item.name === typeName) : null;
     return type ? { "id": type.id } : { "name": typeName };
 }
 
 function getBottleSizeData() {
     const bottleSizeName = document.getElementById('bottleSizeInput').value;
     const bottleSizeValue = parseInt(document.getElementById('bottleSizeValue').value);
-    const bottleSize = jsonBottleSizes.find(item => item.size === bottleSizeValue);
+    const bottleSize = jsonBottleSizes ? jsonBottleSizes.find(item => item.size === bottleSizeValue) : null;
 
     return bottleSize ? { "id": bottleSize.id } : { "name": bottleSizeName, "size": bottleSizeValue }; 
 }
