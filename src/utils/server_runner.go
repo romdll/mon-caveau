@@ -17,7 +17,7 @@ func RunWithQuitNotification(serverEngine *gin.Engine) {
 		Handler: serverEngine.Handler(),
 	}
 
-	logger.Println("Starting server at :80")
+	logger.Info("Starting server at :80")
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -29,7 +29,7 @@ func RunWithQuitNotification(serverEngine *gin.Engine) {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	logger.Println("Shutting down server...")
+	logger.Info("Shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -38,5 +38,5 @@ func RunWithQuitNotification(serverEngine *gin.Engine) {
 		logger.Fatalf("Server shutdown failed: %v", err)
 	}
 
-	logger.Println("Server gracefully stopped")
+	logger.Info("Server gracefully stopped")
 }

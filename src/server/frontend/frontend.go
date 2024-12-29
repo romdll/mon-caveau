@@ -19,23 +19,23 @@ var siteData embed.FS
 
 func ServeFrontendFiles(c *gin.Context) {
 	filePath := c.Param("filepath")[1:]
-	logger.Printf("Received request for frontend file: '%s'\n", filePath)
+	logger.Infow("Received request for frontend file", "filePath", filePath)
 
 	if !strings.Contains(filePath, ".") {
-		logger.Printf("File path does not have any suffix, adding .html extension.")
+		logger.Infow("File path does not have any suffix, adding .html extension.", "filePath", filePath)
 		filePath += ".html"
 	}
 
 	if filePath == ".html" {
-		logger.Printf("File path is just '/' translating to index.")
+		logger.Infow("File path is just '/', translating to index.", "filePath", filePath)
 		filePath = "index.html"
 	}
 
 	if utils.IsDebugMode() {
-		logger.Println("Debug mode is enabled, serving from file system.")
+		logger.Infow("Debug mode is enabled, serving from file system.")
 		serveFromFileSystem(c, filePath)
 	} else {
-		logger.Println("Serving from embedded filesystem.")
+		logger.Infow("Serving from embedded filesystem.")
 		serveFromEmbeddedFS(c, filePath)
 	}
 }
@@ -57,29 +57,29 @@ func getHtmlContext(c *gin.Context) map[string]interface{} {
 
 func serveFromFileSystem(c *gin.Context, filePath string) {
 	file := filepath.Join("server", "frontend", "site", filePath)
-	logger.Printf("Serving file from the filesystem: %s", file)
+	logger.Infow("Serving file from the filesystem", "file", file)
 
 	if _, err := os.Stat(file); err != nil {
-		logger.Printf("File not found: %s", file)
+		logger.Debugw("File not found", "file", file, "error", err)
 		c.Status(http.StatusNotFound)
 		return
 	}
 
-	logger.Printf("File found: '%s'", file)
+	logger.Infow("File found", "file", file)
 	contentType := getContentType(filePath)
-	logger.Printf("Guessed content type for file: '%s' is '%s'", filePath, contentType)
+	logger.Infow("Guessed content type for file", "filePath", filePath, "contentType", contentType)
 
 	if strings.Contains(contentType, "text/html") {
 		data, err := os.ReadFile(file)
 		if err != nil {
-			logger.Printf("Error reading HTML file: %v", err)
+			logger.Errorw("Error reading HTML file", "file", file, "error", err)
 			c.Status(http.StatusInternalServerError)
 			return
 		}
 
 		tmpl, err := template.New("index").Parse(string(data))
 		if err != nil {
-			logger.Printf("Error parsing HTML template: %v", err)
+			logger.Errorw("Error parsing HTML template", "file", file, "error", err)
 			c.Status(http.StatusInternalServerError)
 			return
 		}
@@ -87,7 +87,7 @@ func serveFromFileSystem(c *gin.Context, filePath string) {
 		c.Header("Content-Type", contentType)
 		err = tmpl.Execute(c.Writer, getHtmlContext(c))
 		if err != nil {
-			logger.Printf("Error executing template: %v", err)
+			logger.Errorw("Error executing template", "file", file, "error", err)
 			c.Status(http.StatusInternalServerError)
 		}
 	} else {
@@ -97,23 +97,23 @@ func serveFromFileSystem(c *gin.Context, filePath string) {
 }
 
 func serveFromEmbeddedFS(c *gin.Context, filePath string) {
-	logger.Printf("Serving file from embedded filesystem: %s", filePath)
+	logger.Infow("Serving file from embedded filesystem", "filePath", filePath)
 
 	data, err := siteData.ReadFile("site/" + filePath)
 	if err != nil {
-		logger.Printf("Error reading file from embedded filesystem: %s, error: %v", filePath, err)
+		logger.Debugw("Error reading file from embedded filesystem", "filePath", filePath, "error", err)
 		c.Status(http.StatusNotFound)
 		return
 	}
 
-	logger.Printf("File found from embedded filesystem: '%s'", filePath)
+	logger.Infow("File found from embedded filesystem", "filePath", filePath)
 	contentType := getContentType(filePath)
-	logger.Printf("Guessed content type for file: '%s' is '%s'", filePath, contentType)
+	logger.Infow("Guessed content type for file", "filePath", filePath, "contentType", contentType)
 
 	if strings.Contains(contentType, "text/html") {
 		tmpl, err := template.New("index").Parse(string(data))
 		if err != nil {
-			logger.Printf("Error parsing HTML template: %v", err)
+			logger.Errorw("Error parsing HTML template", "filePath", filePath, "error", err)
 			c.Status(http.StatusInternalServerError)
 			return
 		}
@@ -121,7 +121,7 @@ func serveFromEmbeddedFS(c *gin.Context, filePath string) {
 		c.Header("Content-Type", contentType)
 		err = tmpl.Execute(c.Writer, getHtmlContext(c))
 		if err != nil {
-			logger.Printf("Error executing template: %v", err)
+			logger.Errorw("Error executing template", "filePath", filePath, "error", err)
 			c.Status(http.StatusInternalServerError)
 		}
 	} else {

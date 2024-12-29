@@ -21,17 +21,18 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 		for _, baseUrl := range baseUrls {
 			if strings.HasPrefix(requestUrl, baseUrl) {
 				isInBaseUrls = true
+				break
 			}
 		}
 
 		if !isInBaseUrls {
-			logger.Printf("Skipping hard authentication check, URL does not match baseUrl: %s\n", requestUrl)
+			logger.Debugf("Skipping hard authentication check, URL does not match baseUrl: %s", requestUrl)
 
 			sessionToken, err := c.Cookie(database.AuthCookieName)
 			if err == nil && sessionToken != "" {
 				validSessionToken, userID, err := database.VerifyIfSessionExistsAndIsValid(sessionToken)
 				if err == nil && validSessionToken {
-					logger.Printf("Authenticated successfully for request (no hard check): %s", requestUrl)
+					logger.Debugf("Authenticated successfully for request (no hard check): %s", requestUrl)
 					c.Set(ContextIsLoggedIn, true)
 					c.Set(ContextLoggedInUserId, userID)
 				}
@@ -43,7 +44,7 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 
 		for _, avoid := range toAvoid {
 			if strings.Contains(requestUrl, avoid) {
-				logger.Printf("Skipping authentication check, URL contains allowed segment: %s\n", requestUrl)
+				logger.Debugf("Skipping authentication check, URL contains allowed segment: %s", requestUrl)
 				c.Next()
 				return
 			}
@@ -51,16 +52,16 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 
 		sessionToken, err := c.Cookie(database.AuthCookieName)
 		if err != nil || sessionToken == "" {
-			logger.Printf("Unauthorized access attempt, no session token: %s\n", requestUrl)
+			logger.Warnf("Unauthorized access attempt, no session token: %s", requestUrl)
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Vous n'etes pas autorisé à accéder à cette page",
+				"error": "Vous n'êtes pas autorisé à accéder à cette page",
 			})
 			return
 		}
 
 		validSessionToken, userID, err := database.VerifyIfSessionExistsAndIsValid(sessionToken)
 		if err != nil {
-			logger.Printf("Error during session token verification: %v\n", err)
+			logger.Errorf("Error during session token verification: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Une erreur est survenue lors de la vérification de votre authentification.",
 			})
@@ -68,16 +69,16 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 		}
 
 		if !validSessionToken {
-			logger.Printf("Invalid session token for request: %s\n", requestUrl)
+			logger.Warnf("Invalid session token for request: %s", requestUrl)
 
 			c.SetCookie(database.AuthCookieName, "", -1, "/", "", database.IsCookieSecure, true)
 			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "Vous n'etes pas autorisé à accéder à cette page",
+				"error": "Vous n'êtes pas autorisé à accéder à cette page",
 			})
 			return
 		}
 
-		logger.Printf("Authenticated successfully for request: %s", requestUrl)
+		logger.Infof("Authenticated successfully for request: %s", requestUrl)
 		c.Set(ContextIsLoggedIn, true)
 		c.Set(ContextLoggedInUserId, userID)
 		c.Next()

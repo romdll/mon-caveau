@@ -240,7 +240,7 @@ func ApplyMigrations() error {
 	for _, migration := range migrations {
 		if migration.Version > currentVersion {
 			migrationApplied = true
-			logger.Printf("Applying migration %.01f...\n", migration.Version)
+			logger.Infow("Applying migration", "version", migration.Version)
 
 			if _, err := db.Exec(migration.SQL); err != nil {
 				return fmt.Errorf("failed to apply migration %.01f: %w", migration.Version, err)
@@ -250,14 +250,14 @@ func ApplyMigrations() error {
 				return fmt.Errorf("failed to record migration %.01f: %w", migration.Version, err)
 			}
 
-			logger.Printf("Migration %.01f applied successfully\n", migration.Version)
+			logger.Infow("Migration applied successfully", "version", migration.Version)
 		}
 	}
 
 	if migrationApplied {
-		logger.Println("All migrations applied")
+		logger.Infow("All migrations applied")
 	} else {
-		logger.Println("No migrations to apply")
+		logger.Infow("No migrations to apply")
 	}
 	return nil
 }

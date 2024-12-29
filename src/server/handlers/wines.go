@@ -16,7 +16,7 @@ func GET_WinesDashboard(c *gin.Context) {
 
 	totalWines, totalWinesDrankSold, realTotalBottlesAdded, totalCurrentBottles, err := database.GetWinesForDashboard(userId)
 	if err != nil {
-		logger.Printf("Error when getting basic dashboard data: %v", err)
+		logger.Errorw("Error when getting basic dashboard data", "error", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erreur lors de la récuperation des données basiques.",
 		})
@@ -25,7 +25,7 @@ func GET_WinesDashboard(c *gin.Context) {
 
 	winesCountPerRegions, err := database.GetWinesCountPerRegion(userId)
 	if err != nil {
-		logger.Printf("Error when getting wines count per region: %v", err)
+		logger.Errorw("Error when getting wines count per region", "error", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erreur lors de la récuperation du nombre de bouteilles par regions.",
 		})
@@ -34,7 +34,7 @@ func GET_WinesDashboard(c *gin.Context) {
 
 	winesCountPerTypes, err := database.GetWinesCountPerTypes(userId)
 	if err != nil {
-		logger.Printf("Error when getting wines count per types: %v", err)
+		logger.Errorw("Error when getting wines count per types", "error", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erreur lors de la récuperation du nombre de bouteilles par type.",
 		})
@@ -43,7 +43,7 @@ func GET_WinesDashboard(c *gin.Context) {
 
 	last4Transactions, winesIdToName, err := database.Get4LatestsTransactions(userId)
 	if err != nil {
-		logger.Printf("Error when getting the last 4 transactions: %v", err)
+		logger.Errorw("Error when getting the last 4 transactions", "error", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erreur lors de la récuperation des 4 dernieres transactions.",
 		})
@@ -236,9 +236,13 @@ func GET_allWines(c *gin.Context) {
 
 	pageParam := c.DefaultQuery("page", "1")
 	limitParam := c.DefaultQuery("limit", "3")
+	searchQuery := c.DefaultQuery("search", "")
+
+	logger.Infof("Received parameters: page=%s, limit=%s, search='%s'", pageParam, limitParam, searchQuery)
 
 	page, err := strconv.Atoi(pageParam)
 	if err != nil || page < 1 {
+		logger.Warnf("Invalid 'page' parameter: %s", pageParam)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Paramètre 'page' invalide.",
 		})
@@ -247,27 +251,36 @@ func GET_allWines(c *gin.Context) {
 
 	limit, err := strconv.Atoi(limitParam)
 	if err != nil || limit < 1 {
+		logger.Warnf("Invalid 'limit' parameter: %s", limitParam)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Paramètre 'limit' invalide.",
 		})
 		return
 	}
 
-	wines, err := database.GetUserEntitiesWithPagination[database.WineWine](limit, page, userId)
+	logger.Infof("Validated parameters: userId=%d, page=%d, limit=%d, search='%s'", userId, page, limit, searchQuery)
+
+	wines, err := database.GetWinesWithPaginationAndSearch(limit, page, userId, searchQuery)
 	if err != nil {
+		logger.Errorf("Error fetching wines for userId=%d with search='%s': %v", userId, searchQuery, err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erreur interne lors de la recupération de vos vins.",
 		})
 		return
 	}
 
+	logger.Infof("Successfully fetched %d wines for userId=%d with search='%s'", len(wines), userId, searchQuery)
+
 	winesCount, err := database.GetUserWinesCount(userId)
 	if err != nil {
+		logger.Errorf("Error fetching wine count for userId=%d: %v", userId, err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erreur interne lors de la recupération du nombre de vins que vous possédez.",
 		})
 		return
 	}
+
+	logger.Infof("Total wine count for userId=%d is %d", userId, winesCount)
 
 	c.JSON(http.StatusOK, gin.H{
 		"wines": wines,

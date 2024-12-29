@@ -20,20 +20,22 @@ func InitDB() error {
 	var err error
 	db, err = sql.Open("mysql", dsn)
 	if err != nil {
+		logger.Errorw("Failed to open database", "error", err)
 		return fmt.Errorf("failed to open database: %w", err)
 	}
 
 	if err = db.Ping(); err != nil {
+		logger.Errorw("Database connection failed", "error", err)
 		return fmt.Errorf("database connection failed: %w", err)
 	}
 
-	logger.Println("Database connected successfully")
+	logger.Infow("Database connected successfully")
 	return nil
 }
 
 func HealthCheck() bool {
 	if err := db.Ping(); err != nil {
-		logger.Println("Database health check failed:", err)
+		logger.Errorw("Database health check failed", "error", err)
 		return false
 	}
 	return true
@@ -41,7 +43,7 @@ func HealthCheck() bool {
 
 func CloseDB() {
 	if db != nil {
-		logger.Println("Closing database connection")
+		logger.Infow("Closing database connection")
 		db.Close()
 	}
 }

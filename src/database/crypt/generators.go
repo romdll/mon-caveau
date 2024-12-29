@@ -12,13 +12,13 @@ import (
 const AccountKeyLength = 18
 
 func GenerateSecureAccountKey() (string, error) {
-	logger.Println("Generating secure account key...")
+	logger.Info("Generating secure account key...")
 
 	upperLimit := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(AccountKeyLength)), nil)
 
 	randomNum, err := rand.Int(rand.Reader, upperLimit)
 	if err != nil {
-		logger.Printf("Error generating random number: %v", err)
+		logger.Errorf("Error generating random number: %v", err)
 		return "", err
 	}
 
@@ -34,7 +34,7 @@ func GenerateSecureAccountKey() (string, error) {
 	}
 	accountKeyWithHyphens := strings.Join(result, "-")
 
-	logger.Printf("Generated account key: %s", utils.MaskOnlyNumbers(accountKeyWithHyphens, 6))
+	logger.Infof("Generated account key: %s", utils.MaskOnlyNumbers(accountKeyWithHyphens, 6))
 
 	return accountKeyWithHyphens, nil
 }

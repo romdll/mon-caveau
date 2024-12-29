@@ -1,14 +1,13 @@
 package main
 
 import (
-	"log"
 	"moncaveau/database"
 	"moncaveau/server"
 	"moncaveau/utils"
 )
 
 var (
-	logger *log.Logger = utils.CreateLogger("main")
+	logger = utils.CreateLogger("main")
 )
 
 func main() {

@@ -9,7 +9,7 @@ import (
 )
 
 func entityToMap(entity interface{}) (string, map[string]interface{}, error) {
-	logger.Println("Converting entity to map...")
+	logger.Infow("Converting entity to map")
 
 	v := reflect.ValueOf(entity)
 	if v.Kind() == reflect.Ptr {
@@ -17,7 +17,7 @@ func entityToMap(entity interface{}) (string, map[string]interface{}, error) {
 	}
 
 	if v.Kind() != reflect.Struct {
-		logger.Printf("Error: Entity must be a struct or a pointer to a struct. Got: %s\n", v.Kind())
+		logger.Errorw("Entity must be a struct or a pointer to a struct", "actualKind", v.Kind())
 		return "", nil, errors.New("entity must be a struct or a pointer to a struct")
 	}
 
@@ -43,26 +43,26 @@ func entityToMap(entity interface{}) (string, map[string]interface{}, error) {
 	}
 
 	if dbName == "" {
-		logger.Println("Error: Struct must have an unexported field 'DB_NAME'")
+		logger.Errorw("Struct must have an unexported field 'DB_NAME'", "entity", entity)
 		return "", nil, errors.New("struct must have an unexported field 'DB_NAME'")
 	}
 
-	logger.Printf("Entity mapped successfully. DB name: %s\n", dbName)
+	logger.Infow("Entity mapped successfully", "dbName", dbName)
 	return dbName, fieldsMap, nil
 }
 
 func generateSQLUpdateFromEntityById(entity interface{}) (string, []interface{}, error) {
-	logger.Println("Generating SQL UPDATE query from entity...")
+	logger.Infow("Generating SQL UPDATE query from entity")
 
 	dbName, fieldsMap, err := entityToMap(entity)
 	if err != nil {
-		logger.Printf("Error in entityToMap: %v\n", err)
+		logger.Errorw("Error in entityToMap", "error", err)
 		return "", nil, err
 	}
 
 	idValue, hasID := fieldsMap["id"]
 	if !hasID || idValue == nil {
-		logger.Println("Error: The struct must have an 'id' field to use as a condition")
+		logger.Errorw("The struct must have an 'id' field to use as a condition", "entity", entity)
 		return "", nil, errors.New("the struct must have an 'id' field to use as a condition")
 	}
 
@@ -79,7 +79,7 @@ func generateSQLUpdateFromEntityById(entity interface{}) (string, []interface{},
 	}
 
 	if len(setClauses) == 0 {
-		logger.Println("Error: No fields to update")
+		logger.Errorw("No fields to update", "entity", entity)
 		return "", nil, errors.New("no fields to update")
 	}
 
@@ -87,16 +87,16 @@ func generateSQLUpdateFromEntityById(entity interface{}) (string, []interface{},
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE id = ?", dbName, setClause)
 	values = append(values, idValue)
 
-	logger.Printf("Generated SQL UPDATE query: %s\n", query)
+	logger.Infow("Generated SQL UPDATE query", "query", query)
 	return query, values, nil
 }
 
 func generateSQLInsertFromEntity(entity interface{}) (string, []interface{}, error) {
-	logger.Println("Generating SQL INSERT query from entity...")
+	logger.Infow("Generating SQL INSERT query from entity")
 
 	dbName, fieldsMap, err := entityToMap(entity)
 	if err != nil {
-		logger.Printf("Error in entityToMap: %v\n", err)
+		logger.Errorw("Error in entityToMap", "error", err)
 		return "", nil, err
 	}
 
@@ -115,7 +115,7 @@ func generateSQLInsertFromEntity(entity interface{}) (string, []interface{}, err
 	}
 
 	if len(columns) == 0 {
-		logger.Println("Error: No fields to insert")
+		logger.Errorw("No fields to insert", "entity", entity)
 		return "", nil, errors.New("no fields to insert")
 	}
 
@@ -124,72 +124,72 @@ func generateSQLInsertFromEntity(entity interface{}) (string, []interface{}, err
 
 	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", dbName, columnClause, placeholderClause)
 
-	logger.Printf("Generated SQL INSERT query: %s\n", query)
+	logger.Infow("Generated SQL INSERT query", "query", query)
 	return query, values, nil
 }
 
 func executeGeneratedSQL(query string, values []interface{}) (sql.Result, error) {
-	logger.Printf("Executing query: %s\n", query)
+	logger.Infow("Executing query", "query", query)
 	result, err := db.Exec(query, values...)
 	if err != nil {
-		logger.Printf("Error executing query: %v\n", err)
+		logger.Errorw("Error executing query", "error", err)
 		return nil, err
 	}
 
-	logger.Println("Query executed successfully.")
+	logger.Infow("Query executed successfully")
 	return result, nil
 }
 
 func InsertEntityById(entity interface{}) (sql.Result, error) {
-	logger.Println("Inserting entity by ID...")
+	logger.Infow("Inserting entity by ID")
 
 	query, args, err := generateSQLInsertFromEntity(entity)
 	if err != nil {
-		logger.Printf("Error generating SQL insert: %v\n", err)
+		logger.Errorw("Error generating SQL insert", "error", err)
 		return nil, err
 	}
 
 	result, err := executeGeneratedSQL(query, args)
 	if err != nil {
-		logger.Printf("Error executing SQL insert: %v\n", err)
+		logger.Errorw("Error executing SQL insert", "error", err)
 		return nil, err
 	}
 
-	logger.Println("Entity inserted successfully.")
+	logger.Infow("Entity inserted successfully")
 	return result, nil
 }
 
 func UpdateEntityById(entity interface{}) (sql.Result, error) {
-	logger.Println("Updating entity by ID...")
+	logger.Infow("Updating entity by ID")
 
 	query, args, err := generateSQLUpdateFromEntityById(entity)
 	if err != nil {
-		logger.Printf("Error generating SQL update: %v\n", err)
+		logger.Errorw("Error generating SQL update", "error", err)
 		return nil, err
 	}
 
 	result, err := executeGeneratedSQL(query, args)
 	if err != nil {
-		logger.Printf("Error executing SQL update: %v\n", err)
+		logger.Errorw("Error executing SQL update", "error", err)
 		return nil, err
 	}
 
-	logger.Println("Entity updated successfully.")
+	logger.Infow("Entity updated successfully")
 	return result, nil
 }
 
 func GetAllEntities[T any]() ([]T, error) {
-	logger.Println("Fetching all entities from table...")
+	logger.Infow("Fetching all entities from table")
 
 	dbName, _, err := entityToMap(new(T))
 	if err != nil {
-		logger.Printf("Error in entityToMap: %v\n", err)
+		logger.Errorw("Error in entityToMap", "error", err)
 		return nil, err
 	}
 
 	rows, err := db.Query("SELECT * FROM " + dbName)
 	if err != nil {
-		logger.Printf("Error executing SELECT query: %v\n", err)
+		logger.Errorw("Error executing SELECT query", "error", err, "query", dbName)
 		return nil, err
 	}
 	defer rows.Close()
@@ -216,7 +216,7 @@ func GetAllEntities[T any]() ([]T, error) {
 
 		err := rows.Scan(dest...)
 		if err != nil {
-			logger.Printf("Error scanning row: %v\n", err)
+			logger.Errorw("Error scanning row", "error", err)
 			return nil, err
 		}
 
@@ -224,70 +224,10 @@ func GetAllEntities[T any]() ([]T, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		logger.Printf("Error during rows iteration: %v\n", err)
+		logger.Errorw("Error during rows iteration", "error", err)
 		return nil, err
 	}
 
-	logger.Printf("Successfully fetched %d entities from the table %s.\n", len(entities), dbName)
-	return entities, nil
-}
-
-func GetUserEntitiesWithPagination[T any](limit, page, userId int) ([]T, error) {
-	if limit <= 0 || page <= 0 {
-		return nil, fmt.Errorf("invalid limit or page: both must be greater than zero")
-	}
-
-	logger.Printf("Fetching entities from table with limit %d and page %d...\n", limit, page)
-
-	dbName, _, err := entityToMap(new(T))
-	if err != nil {
-		logger.Printf("Error in entityToMap: %v\n", err)
-		return nil, err
-	}
-
-	queryBase := "SELECT * FROM " + dbName + " WHERE account_id = ? LIMIT ? OFFSET ?"
-	offset := (page - 1) * limit
-	rows, err := db.Query(queryBase, userId, limit, offset)
-	if err != nil {
-		logger.Printf("Error executing SELECT query: %v\n", err)
-		return nil, err
-	}
-	defer rows.Close()
-
-	var entities []T
-
-	for rows.Next() {
-		newEntity := new(T)
-
-		var dest []interface{}
-
-		val := reflect.ValueOf(newEntity).Elem()
-		numFields := val.NumField()
-
-		for i := 0; i < numFields; i++ {
-			field := val.Type().Field(i)
-
-			if field.Name == "DB_NAME" {
-				continue
-			}
-
-			dest = append(dest, val.Field(i).Addr().Interface())
-		}
-
-		err := rows.Scan(dest...)
-		if err != nil {
-			logger.Printf("Error scanning row: %v\n", err)
-			return nil, err
-		}
-
-		entities = append(entities, *newEntity)
-	}
-
-	if err := rows.Err(); err != nil {
-		logger.Printf("Error during rows iteration: %v\n", err)
-		return nil, err
-	}
-
-	logger.Printf("Successfully fetched %d entities from the table %s.\n", len(entities), dbName)
+	logger.Infow("Successfully fetched entities", "count", len(entities), "table", dbName)
 	return entities, nil
 }
