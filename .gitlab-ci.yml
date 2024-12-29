@@ -5,7 +5,7 @@ workflow:
     - when: always
 
 stages:
-  - securityTest
+  - security
   - test
   - build
 
@@ -48,12 +48,6 @@ compile_versioned:
   when: manual 
 
 securityTest:
-  stage: securityTest
-  script:
-    - cd src
-    - echo "Running Security Testing..."
-    - go get github.com/securego/gosec/v2/cmd/gosec
-    - gosec ./...
-  allow_failure: true 
-  after_script:
-    - echo "Security scan completed."
+  stage: security
+  include:
+    - template: Jobs/SAST.gitlab-ci.yml
