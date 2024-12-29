@@ -2,31 +2,58 @@ image: golang:latest
 
 workflow:
   rules:
-    - when: always
+    - when: always  # Always trigger the pipeline
 
 stages:
-- security
-- test
-- build
+  - security
+  - test
+  - build
 
 format:
   stage: test
   script:
-  - cd src
-  - go mod tidy
-  - go fmt ./...
-  - go vet ./...
-  - go test ./...
+    - cd src
+    - go mod tidy
+    - go fmt ./...
+    - go vet ./...
+    - go test ./...
 
-compile:
+compile_regular:
   stage: build
   script:
-  - cd src
-  - mkdir -p mybinaries
-  - go mod tidy
-  - go build -o mybinaries ./...
+    - cd src
+    - mkdir -p mybinaries
+    - go mod tidy
+    - echo "Regular Build: Building without versioning"
+    - go build -o mybinaries/myapp ./...
+  artifacts:
+    paths:
+      - src/mybinaries/myapp
+    expire_in: 1 week
+  when: always
+
+compile_versioned:
+  stage: build
+  script:
+    - cd src
+    - mkdir -p mybinaries
+    - go mod tidy
+    - VERSION="v$(git describe --tags --always --abbrev=7)" 
+    - echo "Versioned Build: Building with version: $VERSION"
+    - go build -ldflags "-X version.Version=$VERSION" -o mybinaries/myapp ./...
+  artifacts:
+    paths:
+      - src/mybinaries/myapp
+    expire_in: 1 week
+  when: manual 
 
 sast:
   stage: security
-include:
-- template: Security/SAST.gitlab-ci.yml
+  script:
+    - cd src
+    - echo "Running Security Testing..."
+    - go get github.com/securego/gosec/v2/cmd/gosec
+    - gosec ./...
+  allow_failure: true 
+  after_script:
+    - echo "Security scan completed."
