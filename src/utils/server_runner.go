@@ -12,6 +12,8 @@ import (
 )
 
 func RunWithQuitNotification(serverEngine *gin.Engine) {
+	logServerStartDetails(serverEngine)
+
 	srv := &http.Server{
 		Addr:    ":80",
 		Handler: serverEngine.Handler(),
