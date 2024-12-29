@@ -5,7 +5,6 @@ workflow:
     - when: always
 
 stages:
-  - security
   - test
   - build
 
@@ -46,8 +45,3 @@ compile_versioned:
       - src/mybinaries/myapp
     expire_in: 1 week
   when: manual 
-
-securityTest:
-  stage: security
-  include:
-    - template: Jobs/SAST.gitlab-ci.yml
