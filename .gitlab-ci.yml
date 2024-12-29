@@ -48,7 +48,7 @@ compile_versioned:
   when: manual 
 
 securityTest:
-  stage: security
+  stage: securityTest
   script:
     - cd src
     - echo "Running Security Testing..."
