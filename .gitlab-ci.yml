@@ -5,7 +5,7 @@ workflow:
     - when: always
 
 stages:
-  - security
+  - securityTest
   - test
   - build
 
@@ -47,7 +47,7 @@ compile_versioned:
     expire_in: 1 week
   when: manual 
 
-sast:
+securityTest:
   stage: security
   script:
     - cd src
