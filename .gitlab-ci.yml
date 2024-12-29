@@ -39,7 +39,7 @@ compile_versioned:
     - mkdir -p mybinaries
     - go mod tidy
     - VERSION="v$(git describe --tags --always --abbrev=7)" 
-    - echo "Versioned Build: Building with version: $VERSION"
+    - echo "Versioned Build - Building with version: $VERSION"
     - go build -ldflags "-X version.Version=$VERSION" -o mybinaries/myapp ./...
   artifacts:
     paths:
