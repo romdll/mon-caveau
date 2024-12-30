@@ -3,7 +3,9 @@ package server
 import (
 	"moncaveau/server/frontend"
 	"moncaveau/server/handlers"
+	"moncaveau/server/handlers/debug"
 	"moncaveau/server/middlewares"
+	"moncaveau/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -49,6 +51,11 @@ func CreateServer() *gin.Engine {
 	r.GET(Favicon, func(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, RealFavicon)
 	})
+
+	// Debug handlers
+	if utils.IsDebugMode() {
+		r.GET(DebugSqlStructure, debug.GET_DatabaseStructure)
+	}
 
 	return r
 }

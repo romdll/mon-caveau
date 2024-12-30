@@ -39,7 +39,7 @@ function showLoggedInModal() {
 
         if (countdown <= 0) {
             clearInterval(countdownInterval);
-            window.location.replace("/v1/dashboard");
+            window.location.replace("/v1/dashboard"); 
         }
     }, 1000);
 }
@@ -74,8 +74,6 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         }
     })
     .then(data => {
-        const modalTitle = document.getElementById('loggedInTitle');
-        modalTitle.textContent = "Votre compte est valide !"
         showLoggedInModal();
     })
     .catch((error) => {

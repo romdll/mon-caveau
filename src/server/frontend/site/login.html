@@ -13,30 +13,36 @@
 </head>
 
 <body>
+    <div class="main-container">
+        <header class="header">
+            <img src="/v1/images/logo.png" alt="Logo de Mon Caveau" class="logo">
+        </header>
 
-    <div class="container">
-        <img src="/v1/images/logo.png" alt="Logo de moncaveau.com" class="logo">
-
-        <h1>Se connecter</h1>
-
-        <form id="loginForm" method="POST">
-            <div class="input-group">
-                <input type="text" name="account_key" id="account_key" placeholder="xxxxxx-xxxxxx-xxxxxx" maxlength="20"
-                    pattern="\d{6}-\d{6}-\d{6}" required>
+        <section class="login-section">
+            <h1 class="title">Se connecter à <span>Mon Caveau</span></h1>
+            <form id="loginForm" method="POST" class="login-form">
+                <div class="input-group">
+                    <input type="text" name="account_key" id="account_key" 
+                           placeholder="Clé de compte (xxxxxx-xxxxxx-xxxxxx)" 
+                           maxlength="20" 
+                           pattern="\d{6}-\d{6}-\d{6}" 
+                           required>
+                </div>
+                <div class="remember-me">
+                    <input type="checkbox" id="rememberMe" name="rememberMe">
+                    <label for="rememberMe">Se souvenir de moi</label>
+                </div>
+                <button type="submit" class="cta-button">Se connecter</button>
+            </form>
+            <div class="info-text">
+                <p>Pas de compte ?</p>
+                <button class="register-button" onclick="generateAccountKey()">Créer un compte</button>
             </div>
-        
-            <div class="remember-me">
-                <input type="checkbox" id="rememberMe" name="rememberMe">
-                <label for="rememberMe">Se souvenir de moi</label>
-            </div>
-        
-            <button type="submit" class="login-button">Se connecter</button>
-        </form>
+        </section>
 
-        <div class="info-text">
-            <p>Vous n'avez pas de compte ?</p>
-            <p><button class="register-button" onclick="generateAccountKey()">Créer un compte</button></p>
-        </div>
+        <footer class="footer">
+            <p>&copy; 2024 Mon Caveau. Tous droits réservés.</p>
+        </footer>
     </div>
 
     <div id="registerModal" class="modal">
@@ -50,7 +56,7 @@
 
     <div id="loggedInModal" class="modal">
         <div class="modal-content">
-            <h2 id="loggedInTitle">Vous êtes déjà connecté !</h2>
+            <h2>Vous êtes déjà connecté !</h2>
             <p>Redirection vers votre tableau de bord dans <span id="countdown">3</span> secondes...</p>
         </div>
     </div>
@@ -67,7 +73,6 @@
     <script>
         offerRedirectIfAlreadyLoggedIn({{.LoggedIn }});
     </script>
-
 </body>
 
 </html>

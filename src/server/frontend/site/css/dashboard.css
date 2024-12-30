@@ -743,6 +743,11 @@ body {
     transition: background-color 0.3s;
 }
 
+.wine-item button:disabled {
+    background-color: #797979 !important;
+    cursor: not-allowed;
+}
+
 .wine-item button.edit {
     background-color: #ff9800;
 }

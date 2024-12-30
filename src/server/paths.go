@@ -13,6 +13,9 @@ const (
 	ApiWinesFetchDomains          = ApiBase + "/wines/domains"
 	ApiWinesFetchPaginated        = ApiBase + "/wines"
 
+	DebugBase         = "/debug"
+	DebugSqlStructure = DebugBase + "/sql/dump"
+
 	Frontend    = "/v1/*filepath"
 	Favicon     = "/favicon.ico"
 	RealFavicon = "/v1/icon/favicon.ico"

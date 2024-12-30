@@ -69,7 +69,7 @@ async function loadWines(page) {
                     <p><strong>Quantity:</strong> ${wine.quantity}</p>
                 </div>
                 <div class="wine-item-actions">
-                    <button class="edit" onclick="editWine(${wine.id})">Modifier</button>
+                    <button class="edit" onclick="editWine(${wine.id})" disabled>Modifier</button>
                     <button class="delete" onclick="askDeleteWine(${wine.id})">Supprimer</button>
                 </div>`;
 
