@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"moncaveau/version"
 	"os"
 
@@ -14,16 +13,6 @@ func logServerConfig() {
 	for _, envVar := range os.Environ() {
 		logger.Infof("%s", envVar)
 	}
-}
-
-func getGinMiddlewareNames(engine *gin.Engine) []string {
-	var middlewareNames []string
-
-	for _, handler := range engine.Handlers {
-		middlewareNames = append(middlewareNames, fmt.Sprintf("%T", handler))
-	}
-
-	return middlewareNames
 }
 
 func logServerStartDetails(serverEngine *gin.Engine) {
@@ -41,8 +30,7 @@ func logServerStartDetails(serverEngine *gin.Engine) {
 		logger.Infof("Method: %s, Path: %s", route.Method, route.Path)
 	}
 
-	middlewareNames := getGinMiddlewareNames(serverEngine)
-	logger.Infof("Total number of middleware registered: %d", len(middlewareNames))
+	logger.Infof("Total number of middleware registered: %d", len(serverEngine.Handlers))
 
 	if !IsDebugMode() {
 		logger.Infof("Server version: %s", version.Version)

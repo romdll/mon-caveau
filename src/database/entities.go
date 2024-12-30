@@ -14,7 +14,7 @@ type Account struct {
 	CreatedAt  string `db:"created_at"`
 
 	// Exceptionnal field for login ONLY
-	RememberMe bool `json:"rememberMe,omitempty"`
+	RememberMe bool `json:"remember_me,omitempty"`
 }
 
 type Session struct {

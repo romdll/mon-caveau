@@ -6,6 +6,11 @@ set MON_CAVEAU_DB_HOST=host
 set MON_CAVEAU_DB_PORT=port
 set MON_CAVEAU_DB_NAME=name
 
+set USE_TLS=false
+set CERT_FILE=""
+set KEY_FILE=""
+set DOMAIN_NAME=""
+
 set DEBUG_MODE=true
 
 cd ../src/

@@ -1,5 +1,24 @@
 function generateAccountKey() {
-    alert("Une nouvelle clé d'accès a été générée. (Ceci est simulé pour le moment.)");
+    fetch('/api/register', {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+        const modal = document.getElementById('registerModal');
+        const keyElement = document.getElementById('newAccountKey');
+        keyElement.textContent = `Votre nouvelle clé : ${data.key}`;
+        modal.style.display = 'flex';
+
+        document.getElementById('saveKeyButton').onclick = () => {
+            navigator.clipboard.writeText(data.key)
+                .then(() => alert('Clé copiée dans le presse-papiers !'))
+                .catch(() => alert('Échec de la copie de la clé.'));
+        };
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorModal('Échec de la génération de la clé.');
+    });
 }
 
 function offerRedirectIfAlreadyLoggedIn(loggedIn) {
@@ -9,13 +28,11 @@ function offerRedirectIfAlreadyLoggedIn(loggedIn) {
 }
 
 function showLoggedInModal() {
-    // Show modal
     const modal = document.getElementById('loggedInModal');
     const countdownElement = document.getElementById('countdown');
     let countdown = 3;
     modal.style.display = 'flex';
 
-    // Update countdown every second
     const countdownInterval = setInterval(() => {
         countdown--;
         countdownElement.textContent = countdown;
@@ -35,8 +52,12 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     event.preventDefault();
     
     const accountKey = document.getElementById('account_key').value;
+    const rememberMe = document.getElementById('rememberMe').checked;
 
-    const data = { account_key: accountKey };
+    const data = { 
+        account_key: accountKey,
+        remember_me: rememberMe
+    };
 
     fetch('/api/login', {
         method: 'POST',

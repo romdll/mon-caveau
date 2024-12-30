@@ -171,3 +171,22 @@ input[type="text"]:focus {
 .modal button:hover {
     background-color: #0056b3;
 }
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin: 10px 0 20px;
+}
+
+.remember-me input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.remember-me label {
+    font-size: 1em;
+    color: #333;
+    cursor: pointer;
+}

@@ -28,6 +28,7 @@ var (
 	}
 	AuthAvoidPages = []string{
 		ApiLogin,
+		ApiRegister,
 	}
 )
 

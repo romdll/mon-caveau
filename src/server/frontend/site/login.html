@@ -24,13 +24,27 @@
                 <input type="text" name="account_key" id="account_key" placeholder="xxxxxx-xxxxxx-xxxxxx" maxlength="20"
                     pattern="\d{6}-\d{6}-\d{6}" required>
             </div>
-
+        
+            <div class="remember-me">
+                <input type="checkbox" id="rememberMe" name="rememberMe">
+                <label for="rememberMe">Se souvenir de moi</label>
+            </div>
+        
             <button type="submit" class="login-button">Se connecter</button>
         </form>
 
         <div class="info-text">
             <p>Vous n'avez pas de compte ?</p>
             <p><button class="register-button" onclick="generateAccountKey()">Créer un compte</button></p>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h2>Nouvelle clé générée</h2>
+            <p id="newAccountKey"></p>
+            <button id="saveKeyButton">Sauvegarder la clé</button>
+            <button onclick="closeModal('registerModal')">Fermer</button>
         </div>
     </div>
 

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"crypto/tls"
 	"net/http"
 	"os"
 	"os/signal"
@@ -9,20 +10,59 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 func RunWithQuitNotification(serverEngine *gin.Engine) {
 	logServerStartDetails(serverEngine)
 
+	useTLS := os.Getenv("USE_TLS") == "true"
+	certFile := os.Getenv("CERT_FILE")
+	keyFile := os.Getenv("KEY_FILE")
+	domainName := os.Getenv("DOMAIN_NAME")
+
+	addr := ":80"
+	if useTLS {
+		addr = ":443"
+	}
+
 	srv := &http.Server{
-		Addr:    ":80",
+		Addr:    addr,
 		Handler: serverEngine.Handler(),
 	}
 
-	logger.Info("Starting server at :80")
+	if useTLS {
+		if certFile != "" && keyFile != "" {
+			logger.Info("Using custom TLS certificates")
+			srv.TLSConfig = &tls.Config{
+				Certificates: []tls.Certificate{
+					loadCertificate(certFile, keyFile),
+				},
+			}
+		} else {
+			logger.Info("Using Let's Encrypt auto-certification")
+			manager := autocert.Manager{
+				Cache:      autocert.DirCache(".certs"),
+				Prompt:     autocert.AcceptTOS,
+				HostPolicy: autocert.HostWhitelist(domainName),
+			}
+			srv.TLSConfig = &tls.Config{
+				GetCertificate: manager.GetCertificate,
+			}
+			srv.Handler = manager.HTTPHandler(serverEngine.Handler())
+		}
+	}
+
+	logger.Infof("Starting server at %s", addr)
 
 	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		var err error
+		if useTLS {
+			err = srv.ListenAndServeTLS("", "")
+		} else {
+			err = srv.ListenAndServe()
+		}
+		if err != nil && err != http.ErrServerClosed {
 			logger.Fatalf("Error running the server: %v", err)
 		}
 	}()
@@ -41,4 +81,12 @@ func RunWithQuitNotification(serverEngine *gin.Engine) {
 	}
 
 	logger.Info("Server gracefully stopped")
+}
+
+func loadCertificate(certFile, keyFile string) tls.Certificate {
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		logger.Fatalf("Failed to load certificates: %v", err)
+	}
+	return cert
 }
