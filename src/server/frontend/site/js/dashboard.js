@@ -63,6 +63,7 @@ async function fetchSpecificData(sectionId) {
             await SetupCollectionPage();
             break;
         case 'statsContent':
+            await SetupStatisticsPage();
             break;
         case 'accountContent':
             break;

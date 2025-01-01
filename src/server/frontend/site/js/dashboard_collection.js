@@ -34,6 +34,7 @@ async function loadWines(page) {
         placeholder.innerHTML = `
             <div class="wine-info">
                 <h4 class="loading-placeholder-text">Loading...</h4>
+                <p class="loading-placeholder-text"><strong>Domaine:</strong> Loading...</p>
                 <p class="loading-placeholder-text"><strong>Type:</strong> Loading...</p>
                 <p class="loading-placeholder-text"><strong>Région:</strong> Loading...</p>
                 <p class="loading-placeholder-text"><strong>Taille:</strong> Loading...</p>
@@ -62,11 +63,11 @@ async function loadWines(page) {
             wineItem.innerHTML = `
                 <div class="wine-info">
                     <h4>${wine.name} (${wine.vintage})</h4>
-                    <p><strong>Domain:</strong> ${domainName}</p>
+                    <p><strong>Domaine:</strong> ${domainName}</p>
                     <p><strong>Type:</strong> ${typeName}</p>
-                    <p><strong>Region:</strong> ${regionName}</p>
-                    <p><strong>Size:</strong> ${bottleSizeName}</p>
-                    <p><strong>Quantity:</strong> ${wine.quantity}</p>
+                    <p><strong>Région:</strong> ${regionName}</p>
+                    <p><strong>Taille:</strong> ${bottleSizeName}</p>
+                    <p><strong>Quantité:</strong> ${wine.quantity}</p>
                 </div>
                 <div class="wine-item-actions">
                     <button class="edit" onclick="editWine(${wine.id})" disabled>Modifier</button>

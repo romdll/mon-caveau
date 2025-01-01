@@ -1,17 +1,15 @@
-// Gets a bit lame colors and not easy to recognize
+// Creates nice colors but a bit the same and maybe this time too much flashy 
 function generateColorFromString(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
-        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
 
-    const red = Math.abs((hash & 0xFF0000) >> 16) % 128 + 128;
-    const green = Math.abs((hash & 0x00FF00) >> 8) % 128 + 128;
-    const blue = Math.abs(hash & 0x0000FF) % 128 + 128;
+    const hue = Math.abs(hash) % 360;
+    const saturation = 70 + (Math.abs(hash) % 30); 
+    const lightness = 50 + (Math.abs(hash) % 20);
 
-    const hexColor = ((1 << 24) | (red << 16) | (green << 8) | blue).toString(16).slice(1).toUpperCase();
-
-    return `#${hexColor}`;
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
 async function SetupDashboardPage() {
@@ -35,7 +33,7 @@ async function SetupDashboardPage() {
         value: winesCountPerRegions[region],
     }));
 
-    // const regionColorPalette = Object.keys(winesCountPerRegions).map(generateColorFromString);
+    const regionColorPalette = Object.keys(winesCountPerRegions).map(generateColorFromString);
 
     const regionChartElement = document.getElementById('regionChart')
     const regionChart = echarts.init(regionChartElement);
@@ -50,10 +48,11 @@ async function SetupDashboardPage() {
         },
         tooltip: {
             confine: true,
-            trigger: 'item'
+            trigger: 'item',
+            formatter: '{b}: {c} bouteilles ({d}%)',
         },
         legend: {
-            show: false,
+            show: false
         },
         series: [
             {
@@ -62,6 +61,13 @@ async function SetupDashboardPage() {
                 radius: '50%',
                 data: regionData,
                 // color: regionColorPalette,
+                label: {
+                    formatter: '{b}: {c} ({d}%)',
+                    overflow: 'truncate',
+                    position: 'outer',
+                    alignTo: 'labelLine',
+                    bleedMargin: 5
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -107,7 +113,9 @@ async function SetupDashboardPage() {
             left: 'center'
         },
         tooltip: {
-            trigger: 'item'
+            confine: true,
+            trigger: 'item',
+            formatter: '{b}: {c} bouteilles ({d}%)',
         },
         legend: {
             show: false,
@@ -119,6 +127,13 @@ async function SetupDashboardPage() {
                 radius: '50%',
                 data: typeData,
                 // color: typeColorPalette,
+                label: {
+                    formatter: '{b}: {c} ({d}%)',
+                    overflow: 'truncate',
+                    position: 'outer',
+                    alignTo: 'labelLine',
+                    bleedMargin: 5
+                },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
@@ -166,7 +181,7 @@ async function SetupDashboardPage() {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: false, 
+                hour12: false,
             });
 
             const quantityWord = transaction.quantity > 1 ? 'bouteilles' : 'bouteille';

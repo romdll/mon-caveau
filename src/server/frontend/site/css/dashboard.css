@@ -926,6 +926,13 @@ body {
     background-color: #c0392b;
 }
 
+.footer {
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: #aaa;
+    text-align: center;
+}
+
 @keyframes shimmer {
     0% {
         background-position: -100%;
