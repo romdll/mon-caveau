@@ -27,8 +27,9 @@ func RunWithQuitNotification(serverEngine *gin.Engine) {
 	}
 
 	srv := &http.Server{
-		Addr:    addr,
-		Handler: serverEngine.Handler(),
+		Addr:              addr,
+		Handler:           serverEngine.Handler(),
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	if useTLS {
@@ -38,6 +39,7 @@ func RunWithQuitNotification(serverEngine *gin.Engine) {
 				Certificates: []tls.Certificate{
 					loadCertificate(certFile, keyFile),
 				},
+				MinVersion: tls.VersionTLS12,
 			}
 		} else {
 			logger.Info("Using Let's Encrypt auto-certification")
@@ -48,6 +50,7 @@ func RunWithQuitNotification(serverEngine *gin.Engine) {
 			}
 			srv.TLSConfig = &tls.Config{
 				GetCertificate: manager.GetCertificate,
+				MinVersion:     tls.VersionTLS12,
 			}
 			srv.Handler = manager.HTTPHandler(serverEngine.Handler())
 		}

@@ -56,7 +56,16 @@ func getHtmlContext(c *gin.Context) map[string]interface{} {
 }
 
 func serveFromFileSystem(c *gin.Context, filePath string) {
-	file := filepath.Join("server", "frontend", "site", filePath)
+	baseDir := filepath.Join("server", "frontend", "site")
+	cleanedPath := filepath.Clean(filePath)
+	file := filepath.Join(baseDir, cleanedPath)
+
+	if !strings.HasPrefix(file, baseDir) {
+		logger.Warnw("Attempt to access file outside base directory", "requestedPath", filePath, "resolvedPath", file)
+		c.Status(http.StatusForbidden)
+		return
+	}
+
 	logger.Infow("Serving file from the filesystem", "file", file)
 
 	if _, err := os.Stat(file); err != nil {
@@ -68,6 +77,12 @@ func serveFromFileSystem(c *gin.Context, filePath string) {
 	logger.Infow("File found", "file", file)
 	contentType := getContentType(filePath)
 	logger.Infow("Guessed content type for file", "filePath", filePath, "contentType", contentType)
+
+	// This is not necessary as we already prevent
+	// G304 (CWE-22): Potential file inclusion via variable (Confidence: HIGH, Severity: MEDIUM)
+	// with a clean above and a verification
+	// but its here to remove the error from gosec verifications
+	file = filepath.Clean(file)
 
 	if strings.Contains(contentType, "text/html") {
 		data, err := os.ReadFile(file)

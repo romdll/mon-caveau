@@ -44,6 +44,11 @@ func HealthCheck() bool {
 func CloseDB() {
 	if db != nil {
 		logger.Infow("Closing database connection")
-		db.Close()
+		err := db.Close()
+		if err != nil {
+			logger.Errorf("Error when closing the database: %w", err)
+		} else {
+			logger.Infow("Closed the database connection succesfully")
+		}
 	}
 }
