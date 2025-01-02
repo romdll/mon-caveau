@@ -1,10 +1,10 @@
 #!/bin/bash
 
-export MON_CAVEAU_DB_USER=user
-export MON_CAVEAU_DB_PASSWORD=password
-export MON_CAVEAU_DB_HOST=host
-export MON_CAVEAU_DB_PORT=port
-export MON_CAVEAU_DB_NAME=name
+export MON_CAVEAU_DB_USER=root
+export MON_CAVEAU_DB_PASSWORD=mysql
+export MON_CAVEAU_DB_HOST=localhost
+export MON_CAVEAU_DB_PORT=3306
+export MON_CAVEAU_DB_NAME=moncaveau
 
 export USE_TLS=false
 export CERT_FILE=""

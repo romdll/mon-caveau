@@ -4,22 +4,22 @@ import (
 	"moncaveau/database"
 )
 
-func ToEntity(data database.WineCreation) database.WineWine {
+func ToWineWineEntity(entry database.WineCreation) database.WineWine {
 	entity := database.WineWine{}
 
-	entity.Name = data.Name
+	entity.Name = entry.Name
 
-	entity.DomainID = data.Domaine.ID
-	entity.RegionID = data.Region.ID
-	entity.TypeID = data.Type.ID
-	entity.BottleSizeID = data.BottleSize.ID
+	entity.DomainID = entry.Domaine.ID
+	entity.RegionID = entry.Region.ID
+	entity.TypeID = entry.Type.ID
+	entity.BottleSizeID = entry.BottleSize.ID
 
-	entity.Vintage = data.Vintage
-	entity.Quantity = data.Quantity
+	entity.Vintage = entry.Vintage
+	entity.Quantity = entry.Quantity
 
-	entity.BuyPrice = data.BuyPrice
-	entity.Description = data.Description
-	entity.Image = data.Image
+	entity.BuyPrice = entry.BuyPrice
+	entity.Description = entry.Description
+	entity.Image = entry.Image
 
 	return entity
 }

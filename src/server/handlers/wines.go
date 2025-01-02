@@ -224,7 +224,7 @@ func POST_CreateWine(c *gin.Context) {
 	// TODO verify all the sub ids to make sure they exists
 
 	userId := c.GetInt(middlewares.ContextLoggedInUserId)
-	realWine := transformers.ToEntity(data)
+	realWine := transformers.ToWineWineEntity(data)
 	realWine.AccountID = userId
 
 	_, err := database.InsertEntityById(realWine)

@@ -11,6 +11,8 @@ var (
 )
 
 func main() {
+	logger.Info("Main called - Starting everything")
+
 	if err := database.InitDB(); err != nil {
 		logger.Fatalf("Failed to initialize database: %v", err)
 	}
@@ -19,18 +21,6 @@ func main() {
 	if err := database.ApplyMigrations(); err != nil {
 		logger.Fatalf("Failed to apply migrations: %v", err)
 	}
-
-	// accountKey, err := crypt.GenerateSecureAccountKey()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// fmt.Println(accountKey)
-	// acc := &database.Account{
-	// 	AccountKey: accountKey,
-	// }
-
-	// database.InsertEntityById(acc)
 
 	serverEngine := server.CreateServer()
 	utils.RunWithQuitNotification(serverEngine)

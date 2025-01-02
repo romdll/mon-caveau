@@ -7,7 +7,12 @@
     - [X] Auto migrations
     - [X] Entities dynamic sql creation
         - [X] Avoid inserting an id when creating a new entity
-- [X] Server starter + logger + crash handler + quit handler
+- [X] Server
+    - [X] Quick starter with config (env)
+    - [X] Logger system
+    - [X] Crash handler attached
+    - [X] Quit handler to clean everything
+    - [X] Allow TLS config (aka https)
 - [X] Authentification 
 - [ ] Frontend
     - [X] Debug system with direct file access
@@ -16,8 +21,8 @@
     - [X] Create the login page 
     - [ ] Create the register page
     - [X] Wine dashboard/dashboard page
-    - [ ] Wine dashboard/collection page
-    - [ ] Wine dashboard/statistics page
+    - [X] Wine dashboard/collection page
+    - [X] Wine dashboard/statistics page
     - [ ] Wine dashboard/account page
     - [ ] All the pages above should be nice to use either on phone and computer
 - [ ] Login / Register
@@ -29,7 +34,7 @@
     - [X] Login with only Account Key (generated unique)
     - [X] Password encryption with salt (+ peper ?)
     - [X] Basic cookie system with expiration
-    - [ ] Cookie system with "remember me" thing
+    - [X] Cookie system with "remember me" thing
     - [ ] Email verification
     - [ ] Allow to force / unforce some fields for the login (password / email / account key) (at least 1 and password / email can't be alone) 
 - [ ] Wine collection system
@@ -40,9 +45,10 @@
     - [X] We can add a new domain
     - [X] We can add a new bottle size
     - [ ] Allow all the adds above with verification by admin
-    - [ ] Create statistics from the wines
+    - [X] Create statistics from the wines
     - [ ] Allow quick modification of quantity
     - [ ] Allow reusage of images of the same wine name for an other user
+    - [ ] Allow auto completion when typing the wine name (offer the posibility to use already created wine name and complete all the other fields with the correct data but let the user obviously change everything if he wants)
 - [ ] Wine rating system
     - [ ] Be able to rate a wine very fast and easly
 - [ ] Wine label scan
@@ -56,4 +62,3 @@
         - [ ] Setup a SPF dns setting
         - [ ] Setup a DKIM dns setting
         - [ ] Setup a DMARC dns setting
-        - [ ] Setup TLS encryption

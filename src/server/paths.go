@@ -12,6 +12,7 @@ const (
 	ApiWinesFetchBottleSizes      = ApiBase + "/wines/bottles/sizes"
 	ApiWinesFetchDomains          = ApiBase + "/wines/domains"
 	ApiWinesFetchPaginated        = ApiBase + "/wines"
+	ApiWinesFetchTransactions     = ApiBase + "/wines/transactions"
 
 	DebugBase         = "/debug"
 	DebugSqlStructure = DebugBase + "/sql/dump"

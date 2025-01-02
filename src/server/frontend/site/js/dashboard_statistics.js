@@ -13,7 +13,7 @@ const fakeData = {
     ],
     vintages: [1980, 1990, 1995, 2000, 2010, 2015, 2018, 2020],
     domains: [
-        { name: 'Chateau Margaux', value: 15, bottles: 300 }, 
+        { name: 'Chateau Margaux', value: 15, bottles: 300 },
         { name: 'Dom Perignon', value: 12, bottles: 450 },
         { name: 'Sassicaia', value: 10, bottles: 500 },
         { name: 'Penfolds', value: 8, bottles: 250 },
@@ -63,50 +63,128 @@ const wineTypeByRegion = {
     Champagne: { Sparkling: 15 }
 };
 
-async function SetupStatisticsPage() {
-    const charts = {
-        wineTypes: echarts.init(document.getElementById('wineTypes')), 
-        regions: echarts.init(document.getElementById('regions')),
-        vintages: echarts.init(document.getElementById('vintages')),
-        domains: echarts.init(document.getElementById('domains')),
-        transactions: echarts.init(document.getElementById('transactions'))
-    };
+const charts = {
+    wineTypes: echarts.init(document.getElementById('wineTypes')),
+    regions: echarts.init(document.getElementById('regions')),
+    vintages: echarts.init(document.getElementById('vintages')),
+    domains: echarts.init(document.getElementById('domains')),
+    transactions: echarts.init(document.getElementById('transactions'))
+};
 
-    function updateWineTypeChart(region) {
-        let filteredData;
-        let titleText;
-        
-        if (region === "") {
-            filteredData = Object.entries(wineTypeByRegion).reduce((acc, [regionKey, wineTypes]) => {
-                Object.entries(wineTypes).forEach(([name, value]) => {
-                    const existing = acc.find(item => item.name === name);
-                    if (existing) {
-                        existing.value += value;
-                    } else {
-                        acc.push({ name, value });
-                    }
-                });
-                return acc;
-            }, []);
-    
-            titleText = 'Distribution des types de vins';
-        } else {
-            filteredData = Object.entries(wineTypeByRegion[region] || {}).map(([name, value]) => ({ name, value }));
-            titleText = `Distribution des types de vins - ${region}`;
+function processCumulativeTransactions(transactions, accountCreationDate) {
+    const groupedData = {};
+
+    const creationDate = accountCreationDate.split(' ')[0]; 
+
+    transactions.forEach(tx => {
+        const date = tx.date.split('T')[0];
+
+        if (!groupedData[date]) {
+            groupedData[date] = { added: 0, removed: 0, drunk: 0, stock: 0 };
         }
-    
-        charts.wineTypes.setOption({
-            title: {
-                text: titleText,
-                left: 'center'
-            },
-            series: [
-                {
-                    type: 'pie',
-                    data: filteredData
+
+        if (tx.type === "added") groupedData[date].added += tx.quantity;
+        if (tx.type === "removed") groupedData[date].removed += tx.quantity;
+        if (tx.type === "drunk") groupedData[date].drunk += tx.quantity;
+        groupedData[date].stock += tx.quantity;
+    });
+
+    const dates = [];
+    const achats = [];
+    const ventes = [];
+    const consommations = [];
+    const stockData = [];
+
+    if (!groupedData[creationDate]) {
+        groupedData[creationDate] = { added: 0, removed: 0, drunk: 0, stock: 0 };
+    }
+
+    dates.push(creationDate);
+    achats.push(0);
+    ventes.push(0);
+    consommations.push(0);
+    stockData.push(0);
+
+    Object.keys(groupedData).sort().forEach(date => {
+        const dayData = groupedData[date];
+        let cumulativeAdded = achats[achats.length - 1];
+        let cumulativeRemoved = ventes[ventes.length - 1];
+        let cumulativeDrunk = consommations[consommations.length - 1];
+        let cumulativeStock = stockData[stockData.length - 1];
+
+        cumulativeAdded += dayData.added;
+        cumulativeRemoved += dayData.removed;
+        cumulativeDrunk += dayData.drunk;
+        cumulativeStock += dayData.added - dayData.removed - dayData.drunk;
+
+        dates.push(date);
+        achats.push(cumulativeAdded);
+        ventes.push(cumulativeRemoved);
+        consommations.push(cumulativeDrunk);
+        stockData.push(cumulativeStock);
+    });
+
+    return { dates, achats, ventes, consommations, stockData };
+};
+
+function updateWineTypeChart(region) {
+    let filteredData;
+    let titleText;
+
+    if (region === "") {
+        filteredData = Object.entries(wineTypeByRegion).reduce((acc, [regionKey, wineTypes]) => {
+            Object.entries(wineTypes).forEach(([name, value]) => {
+                const existing = acc.find(item => item.name === name);
+                if (existing) {
+                    existing.value += value;
+                } else {
+                    acc.push({ name, value });
                 }
-            ]
-        });
+            });
+            return acc;
+        }, []);
+
+        titleText = 'Distribution des types de vins';
+    } else {
+        filteredData = Object.entries(wineTypeByRegion[region] || {}).map(([name, value]) => ({ name, value }));
+        titleText = `Distribution des types de vins - ${region}`;
+    }
+
+    charts.wineTypes.setOption({
+        title: {
+            text: titleText,
+            left: 'center'
+        },
+        series: [
+            {
+                type: 'pie',
+                data: filteredData
+            }
+        ]
+    });
+}
+
+function emptyChart() {
+    return {
+        title: {
+            textStyle: {
+                color: "grey",
+                fontSize: 20
+            },
+            text: "Aucune donnée",
+            left: "center",
+            top: "center"
+        }
+    }
+}
+
+async function SetupStatisticsPage() {
+    const wineTransactionsRequest = await fetch("/api/wines/transactions");
+    const wineTransactions = await wineTransactionsRequest.json();
+
+    let dates = [], achats = [], ventes = [], consommations = [], stockData = [];
+    if (wineTransactions && wineTransactions.data && wineTransactions.accountCreationDate) {
+        ({ dates, achats, ventes, consommations, stockData } = processCumulativeTransactions(wineTransactions.data, wineTransactions.accountCreationDate));
     }
 
     const options = {
@@ -131,12 +209,12 @@ async function SetupStatisticsPage() {
                                 const totalValue = params.data.children.reduce((sum, child) => sum + child.value, 0);
                                 return `${params.data.name} (${totalValue} bouteilles)`;
                             } else {
-                                return `${params.data.name}: ${params.value}`; 
+                                return `${params.data.name}: ${params.value}`;
                             }
                         },
                         position: 'inside',
                         fontSize: 12,
-                        color: '#ffffff' 
+                        color: '#ffffff'
                     },
                     upperLabel: {
                         show: true,
@@ -166,20 +244,20 @@ async function SetupStatisticsPage() {
             ]
         },
         domains: {
-            title: { 
-                text: 'Top 5 Domaines par Nombre de Bouteilles', 
+            title: {
+                text: 'Top 5 Domaines par Nombre de Bouteilles',
                 left: 'center'
             },
-            tooltip: { 
+            tooltip: {
                 trigger: 'item',
                 formatter: '{b}: {c} bouteilles ({d}%)'
             },
             series: [
                 {
                     type: 'pie',
-                    radius: ['40%', '70%'], 
+                    radius: ['40%', '70%'],
                     label: {
-                        formatter: '{b} ({c})', 
+                        formatter: '{b} ({c})',
                         fontSize: 14,
                         color: '#333'
                     },
@@ -190,70 +268,93 @@ async function SetupStatisticsPage() {
                 }
             ]
         },
-        transactions: {
+        transactions: (wineTransactions && wineTransactions.data && dates.length > 0) ? {
             title: {
                 text: 'Suivi des Transactions et du Stock de Vins',
-                subtext: 'Achats, Ventes, Consommations et Stock',
+                subtext: 'Cumul des Achats, Ventes, Consommations et Stock',
                 left: 'center'
             },
             tooltip: {
                 trigger: 'axis',
+                confine: true, 
                 formatter: function (params) {
-                    let result = `${params[0].name}<br/>`;
+                    let result = `<div style="padding: 10px; font-family: Arial, sans-serif; font-size: 14px;">`;
+        
+                    const formattedDate = new Intl.DateTimeFormat('fr-FR').format(new Date(params[0].name));
+                    result += `<h4 style="margin: 0; color: #333;">Date: ${formattedDate}</h4><br/>`;
+        
+                    let stockValue = null;
+        
                     params.forEach(param => {
-                        result += `${param.seriesName}: ${param.value} bouteilles<br/>`;
+                        if (param.seriesName === 'Stock') {
+                            stockValue = param.value;
+                        }
                     });
+        
+                    if (stockValue !== null) {
+                        result += `<h4 style="margin: 0; color: #000;">Stock: ${stockValue} bouteilles</h4><br/>`;
+                    }
+        
+                    params.forEach(param => {
+                        if (param.seriesName !== 'Stock' && param.value !== 0) {
+                            result += `<div style="color: #555;">${param.seriesName}: <strong>${param.value}</strong> bouteilles</div>`;
+                        }
+                    });
+        
+                    result += `</div>`;
                     return result;
                 }
             },
             legend: {
-                data: ['Achats', 'Ventes', 'Consommations', 'Stock'],
-                orient: 'horizontal', 
-                bottom: 10,            
-                left: 'center'        
+                data: ['Achats (Cumulatif)', 'Ventes (Cumulatif)', 'Consommations (Cumulatif)', 'Stock'],
+                orient: 'horizontal',
+                bottom: 10,
+                left: 'center'
             },
+            dataZoom: [
+                {
+                    type: 'slider',
+                    start: 0,
+                    end: 100,
+                    height: 20,
+                    bottom: 50,
+                },
+                {
+                    type: 'inside',
+                    start: 0,
+                    end: 100,
+                }
+            ],
             xAxis: {
                 type: 'category',
-                data: ['2024-01-01', '2024-01-02', '2024-01-03', '2024-01-04', '2024-01-05'], 
+                data: dates,
             },
             yAxis: {
                 type: 'value'
             },
             series: [
                 {
-                    name: 'Achats',
+                    name: 'Achats (Cumulatif)',
                     type: 'line',
-                    data: [30, 50, 40, 60, 80] 
+                    data: achats
                 },
                 {
-                    name: 'Ventes',
+                    name: 'Ventes (Cumulatif)',
                     type: 'line',
-                    data: [10, 0, 20, 5, 0]
+                    data: ventes
                 },
                 {
-                    name: 'Consommations',
+                    name: 'Consommations (Cumulatif)',
                     type: 'line',
-                    data: [5, 10, 0, 12, 7] 
+                    data: consommations
                 },
                 {
                     name: 'Stock',
                     type: 'line',
-                    data: (function () {
-                        let stock = 100; 
-                        const stockData = [];
-                        const purchases = [30, 50, 40, 60, 80];
-                        const sales = [10, 0, 20, 5, 0]; 
-                        const consumptions = [5, 10, 0, 12, 7];
-                        
-                        for (let i = 0; i < purchases.length; i++) {
-                            stock += purchases[i] - sales[i] - consumptions[i];
-                            stockData.push(stock);
-                        }
-                        return stockData;
-                    })()
+                    data: stockData
                 }
             ]
-        }
+        } : emptyChart()
     };
 
     updateWineTypeChart("");
