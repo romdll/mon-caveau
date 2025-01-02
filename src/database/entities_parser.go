@@ -231,3 +231,48 @@ func GetAllEntities[T any]() ([]T, error) {
 	logger.Infow("Successfully fetched entities", "count", len(entities), "table", dbName)
 	return entities, nil
 }
+
+func SelectEntityById[T any](id interface{}) (*T, error) {
+	logger.Infow("Fetching entity by ID", "id", id)
+
+	entity := new(T)
+
+	dbName, _, err := entityToMap(entity)
+	if err != nil {
+		logger.Errorw("Error in entityToMap", "error", err)
+		return nil, err
+	}
+
+	query := fmt.Sprintf("SELECT * FROM %s WHERE id = ?", dbName)
+	logger.Infow("Generated SELECT query", "query", query)
+
+	val := reflect.ValueOf(entity).Elem()
+	numFields := val.NumField()
+	var dest []interface{}
+
+	for i := 0; i < numFields; i++ {
+		field := val.Type().Field(i)
+		if field.Name == "DB_NAME" {
+			continue
+		}
+		dbTag := field.Tag.Get("db")
+		if dbTag == "" {
+			continue
+		}
+		dest = append(dest, val.Field(i).Addr().Interface())
+	}
+
+	row := db.QueryRow(query, id)
+	err = row.Scan(dest...)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			logger.Warnw("No entity found with the given ID", "id", id)
+			return nil, nil
+		}
+		logger.Errorw("Error scanning row", "error", err)
+		return nil, err
+	}
+
+	logger.Infow("Successfully fetched entity", "entity", entity)
+	return entity, nil
+}

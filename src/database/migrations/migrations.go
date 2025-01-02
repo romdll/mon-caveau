@@ -1,6 +1,7 @@
-package database
+package migrations
 
 import (
+	"database/sql"
 	"fmt"
 )
 
@@ -9,7 +10,7 @@ type Migration struct {
 	SQL     string
 }
 
-func ApplyMigrations() error {
+func ApplyMigrations(db *sql.DB) error {
 	migrations := []Migration{
 		{
 			SQL: `
@@ -223,6 +224,34 @@ func ApplyMigrations() error {
 			`,
 			Version: 5.5,
 		},
+		{
+			SQL: `
+				ALTER TABLE accounts
+				DROP INDEX email;
+			`,
+			Version: 6.1,
+		},
+		{
+			SQL: `
+				ALTER TABLE accounts
+				MODIFY email VARCHAR(255) DEFAULT '',
+				MODIFY password VARCHAR(255) DEFAULT '',
+				MODIFY name VARCHAR(255) DEFAULT '',
+				MODIFY surname VARCHAR(255) DEFAULT '';
+			`,
+			Version: 6.2,
+		},
+		{
+			SQL: `
+				UPDATE accounts
+				SET 
+					email = COALESCE(email, ''),
+					password = COALESCE(password, ''),
+					name = COALESCE(name, ''),
+					surname = COALESCE(surname, '');
+			`,
+			Version: 6.3,
+		},
 	}
 
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version FLOAT PRIMARY KEY)`)
@@ -236,28 +265,51 @@ func ApplyMigrations() error {
 		return fmt.Errorf("failed to fetch current schema version: %w", err)
 	}
 
-	migrationApplied := false
+	logger.Infow("Current schema version", "currentVersion", currentVersion)
+
+	var migrationsToApply []Migration
 	for _, migration := range migrations {
 		if migration.Version > currentVersion {
-			migrationApplied = true
-			logger.Infow("Applying migration", "version", migration.Version)
-
-			if _, err := db.Exec(migration.SQL); err != nil {
-				return fmt.Errorf("failed to apply migration %.01f: %w", migration.Version, err)
-			}
-
-			if _, err := db.Exec(`INSERT INTO schema_migrations (version) VALUES (?)`, migration.Version); err != nil {
-				return fmt.Errorf("failed to record migration %.01f: %w", migration.Version, err)
-			}
-
-			logger.Infow("Migration applied successfully", "version", migration.Version)
+			migrationsToApply = append(migrationsToApply, migration)
 		}
 	}
 
-	if migrationApplied {
-		logger.Infow("All migrations applied")
-	} else {
+	if len(migrationsToApply) == 0 {
 		logger.Infow("No migrations to apply")
+		return nil
+	}
+
+	logger.Infof("Found %d migrations to apply", len(migrationsToApply))
+
+	tx, err := db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+
+	migrationApplied := false
+	for _, migration := range migrationsToApply {
+		migrationApplied = true
+		logger.Infow("Applying migration", "version", migration.Version)
+
+		if _, err := tx.Exec(migration.SQL); err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed to apply migration %.01f: %w", migration.Version, err)
+		}
+
+		if _, err := tx.Exec(`INSERT INTO schema_migrations (version) VALUES (?)`, migration.Version); err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed to record migration %.01f: %w", migration.Version, err)
+		}
+
+		logger.Infow("Migration applied successfully", "version", migration.Version)
+	}
+
+	if migrationApplied {
+		err = tx.Commit()
+		if err != nil {
+			return fmt.Errorf("failed to commit transaction: %w", err)
+		}
+		logger.Infow("All migrations applied")
 	}
 	return nil
 }

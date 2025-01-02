@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"moncaveau/database/migrations"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -51,4 +52,8 @@ func CloseDB() {
 			logger.Infow("Closed the database connection succesfully")
 		}
 	}
+}
+
+func ApplyMigrations() error {
+	return migrations.ApplyMigrations(db)
 }
