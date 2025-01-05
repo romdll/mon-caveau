@@ -57,3 +57,7 @@ func CloseDB() {
 func ApplyMigrations() error {
 	return migrations.ApplyMigrations(db)
 }
+
+func GetAllTablesAndStructures() ([]migrations.TableInfo, error) {
+	return migrations.GetAllTablesAndStructures(db)
+}

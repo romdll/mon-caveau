@@ -287,3 +287,56 @@ func GET_allWines(c *gin.Context) {
 		"total": winesCount,
 	})
 }
+
+func GET_wineStatisticsData(c *gin.Context) {
+	userId := c.GetInt(middlewares.ContextLoggedInUserId)
+	logger.Debugf("Fetching wine statistics data for userId: %d", userId)
+
+	top5Domains, err := database.GetTop5DomainsPerNumberOfBottles(userId)
+	if err != nil {
+		logger.Errorf("Error fetching top 5 domains for userId %d: %v", userId, err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Impossible de récupérer les 5 domaines avec le plus de vins dans votre collection.",
+		})
+		return
+	}
+	logger.Debugf("Successfully fetched top 5 domains for userId %d: %v", userId, top5Domains)
+
+	wineDistributionPerVintage, err := database.GetWineDistributionPerVintage(userId)
+	if err != nil {
+		logger.Errorf("Error fetching wine distribution per vintage for userId %d: %v", userId, err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Impossible de récupérer la distributions par année de votre collection.",
+		})
+		return
+	}
+	logger.Debugf("Successfully fetched wine distribution per vintage for userId %d: %v", userId, wineDistributionPerVintage)
+
+	wineTypesDistributionPerRegion, err := database.GetWineTypesDistributionPerRegions(userId)
+	if err != nil {
+		logger.Errorf("Error fetching wine types distribution per region for userId %d: %v", userId, err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Impossible de récupérer la distribution des types de vins par régions.",
+		})
+		return
+	}
+	logger.Debugf("Successfully fetched wine types distribution per region for userId %d: %v", userId, wineTypesDistributionPerRegion)
+
+	userUsedRegionsWithBottlecount, err := database.GetUserUsedRegionsWithBottleCount(userId)
+	if err != nil {
+		logger.Errorf("Error fetching user used regions with bottle count for userId %d: %v", userId, err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Impossible de récupérer les régions que vous utilisez dans votre collection.",
+		})
+		return
+	}
+	logger.Debugf("Successfully fetched user used regions with bottle count for userId %d: %v", userId, userUsedRegionsWithBottlecount)
+
+	logger.Infof("Successfully fetched all wine statistics data for userId %d", userId)
+	c.JSON(http.StatusOK, gin.H{
+		"top5Domains":                    top5Domains,
+		"wineDistributionPerVintage":     wineDistributionPerVintage,
+		"wineTypesDistributionPerRegion": wineTypesDistributionPerRegion,
+		"userUsedRegionsWithBottlecount": userUsedRegionsWithBottlecount,
+	})
+}

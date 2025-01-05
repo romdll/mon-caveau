@@ -1,67 +1,4 @@
-const fakeData = {
-    wineTypes: [
-        { name: 'Red', value: 40 },
-        { name: 'White', value: 30 },
-        { name: 'Rosé', value: 20 },
-        { name: 'Sparkling', value: 10 }
-    ],
-    regions: [
-        { name: 'France', value: 50 },
-        { name: 'Italy', value: 30 },
-        { name: 'Spain', value: 20 },
-        { name: 'USA', value: 10 }
-    ],
-    vintages: [1980, 1990, 1995, 2000, 2010, 2015, 2018, 2020],
-    domains: [
-        { name: 'Chateau Margaux', value: 15, bottles: 300 },
-        { name: 'Dom Perignon', value: 12, bottles: 450 },
-        { name: 'Sassicaia', value: 10, bottles: 500 },
-        { name: 'Penfolds', value: 8, bottles: 250 },
-        { name: 'Vega Sicilia', value: 5, bottles: 100 }
-    ],
-    transactions: [
-        [0, 0, 5], [0, 1, 10], [0, 2, 15],
-        [1, 0, 20], [1, 1, 25], [1, 2, 30]
-    ],
-    topValues: [
-        { name: 'Sassicaia 2015', value: 500 },
-        { name: 'Chateau Latour 2000', value: 450 },
-        { name: 'Dom Perignon 2012', value: 400 },
-        { name: 'Penfolds Grange 2018', value: 350 },
-        { name: 'Opus One 2017', value: 300 }
-    ]
-};
-
-const regionHierarchy = [
-    {
-        name: 'France',
-        children: [
-            { name: 'Bordeaux', value: 20 },
-            { name: 'Champagne', value: 15 },
-            { name: 'Bourgogne', value: 15 }
-        ]
-    },
-    {
-        name: 'Italy',
-        children: [
-            { name: 'Tuscany', value: 18 },
-            { name: 'Piedmont', value: 12 }
-        ]
-    },
-    {
-        name: 'Spain',
-        children: [
-            { name: 'Rioja', value: 10 },
-            { name: 'Catalonia', value: 10 }
-        ]
-    }
-];
-
-const wineTypeByRegion = {
-    France: { Red: 20, White: 10, Rosé: 5, Sparkling: 5 },
-    Bordeaux: { Red: 10, White: 5, Rosé: 2 },
-    Champagne: { Sparkling: 15 }
-};
+let wineTypeByRegion = {};
 
 const charts = {
     wineTypes: echarts.init(document.getElementById('wineTypes')),
@@ -74,7 +11,7 @@ const charts = {
 function processCumulativeTransactions(transactions, accountCreationDate) {
     const groupedData = {};
 
-    const creationDate = accountCreationDate.split(' ')[0]; 
+    const creationDate = accountCreationDate.split(' ')[0];
 
     transactions.forEach(tx => {
         const date = tx.date.split('T')[0];
@@ -127,26 +64,56 @@ function processCumulativeTransactions(transactions, accountCreationDate) {
     return { dates, achats, ventes, consommations, stockData };
 };
 
-function updateWineTypeChart(region) {
+function updateWineTypeChart(region, parentRegion) {
     let filteredData;
     let titleText;
 
     if (region === "") {
-        filteredData = Object.entries(wineTypeByRegion).reduce((acc, [regionKey, wineTypes]) => {
-            Object.entries(wineTypes).forEach(([name, value]) => {
-                const existing = acc.find(item => item.name === name);
-                if (existing) {
-                    existing.value += value;
-                } else {
-                    acc.push({ name, value });
-                }
+        filteredData = Object.entries(wineTypeByRegion).reduce((acc, [country, regions]) => {
+            Object.entries(regions).forEach(([regionName, wineTypes]) => {
+                Object.entries(wineTypes).forEach(([wineTypeName, value]) => {
+                    const existing = acc.find(item => item.name === wineTypeName);
+                    if (existing) {
+                        existing.value += value;
+                    } else {
+                        acc.push({ name: wineTypeName, value });
+                    }
+                });
             });
             return acc;
         }, []);
 
         titleText = 'Distribution des types de vins';
+    } else if (parentRegion && parentRegion !== "") {
+        const regionData = Object.entries(wineTypeByRegion).reduce((acc, [country, regions]) => {
+            if (country === parentRegion && regions[region]) {
+                Object.entries(regions[region]).forEach(([wineTypeName, value]) => {
+                    acc.push({ name: wineTypeName, value });
+                });
+            }
+            return acc;
+        }, []);
+
+        filteredData = regionData;
+        titleText = `Distribution des types de vins - ${region} (${parentRegion})`;
     } else {
-        filteredData = Object.entries(wineTypeByRegion[region] || {}).map(([name, value]) => ({ name, value }));
+        const regionData = Object.entries(wineTypeByRegion).reduce((acc, [country, regions]) => {
+            if (country === region) {
+                Object.entries(regions).forEach(([regionName, wineTypes]) => {
+                    Object.entries(wineTypes).forEach(([wineTypeName, value]) => {
+                        const existing = acc.find(item => item.name === wineTypeName);
+                        if (existing) {
+                            existing.value += value;
+                        } else {
+                            acc.push({ name: wineTypeName, value });
+                        }
+                    });
+                });
+            }
+            return acc;
+        }, []);
+
+        filteredData = regionData;
         titleText = `Distribution des types de vins - ${region}`;
     }
 
@@ -158,7 +125,9 @@ function updateWineTypeChart(region) {
         series: [
             {
                 type: 'pie',
-                data: filteredData
+                data: filteredData,
+                radius: '65%',
+                center: ['50%', '55%']
             }
         ]
     });
@@ -187,13 +156,65 @@ async function SetupStatisticsPage() {
         ({ dates, achats, ventes, consommations, stockData } = processCumulativeTransactions(wineTransactions.data, wineTransactions.accountCreationDate));
     }
 
+    const wineStatisticsRequest = await fetch("/api/wines/statistics/raw");
+    const wineStatistics = await wineStatisticsRequest.json();
+
+    const { top5Domains, wineDistributionPerVintage, wineTypesDistributionPerRegion, userUsedRegionsWithBottlecount } = wineStatistics;
+
+    const groupedByCountry = userUsedRegionsWithBottlecount.reduce((acc, { region, bottle_count }) => {
+        const { country, name } = region;
+
+        if (!acc[country]) {
+            acc[country] = [];
+        }
+
+        acc[country].push({ name, value: bottle_count });
+
+        return acc;
+    }, {});
+
+    const regionHierarchy = Object.entries(groupedByCountry).map(([country, regions]) => ({
+        name: country,
+        children: regions
+    }));
+
+    wineTypeByRegion = wineTypesDistributionPerRegion.reduce((acc, { region, wine_types }) => {
+        const { country, name: regionName } = region;
+
+        if (!acc[country]) {
+            acc[country] = {};
+        }
+
+        if (!acc[country][regionName]) {
+            acc[country][regionName] = {};
+        }
+
+        wine_types.forEach(wineType => {
+            const wineTypeName = wineType.name;
+            if (!acc[country][regionName][wineTypeName]) {
+                acc[country][regionName][wineTypeName] = 0;
+            }
+            acc[country][regionName][wineTypeName] += wineType.count;
+        });
+
+        return acc;
+    }, {});
+
     const options = {
-        wineTypes: {
-            title: { text: 'Distribution des Types de Vins', left: 'center' },
+        wineTypes: (wineStatistics && wineTypesDistributionPerRegion) ? {
+            title: {
+                text: 'Distribution des Types de Vins',
+                subtext: 'Répartition des vins selon leur type et leur nombre de bouteilles',
+                left: 'center',
+            },
             tooltip: { trigger: 'item' },
-        },
-        regions: {
-            title: { text: 'Représentation Territoriale', left: 'center' },
+        } : emptyChart(),
+        regions: (wineStatistics && userUsedRegionsWithBottlecount) ? {
+            title: {
+                text: 'Représentation Territoriale',
+                subtext: 'Vue d\'ensemble des régions viticoles et du nombre de bouteilles',
+                left: 'center'
+            },
             tooltip: {
                 trigger: 'item',
                 formatter: '{b}: {c}'
@@ -230,22 +251,33 @@ async function SetupStatisticsPage() {
                     }
                 }
             ]
-        },
-        vintages: {
-            title: { text: 'Distributions des Vins par Millésime', left: 'center' },
+        } : emptyChart(),
+        vintages: (wineStatistics && wineDistributionPerVintage) ? {
+            title: {
+                text: 'Distributions des Vins par Millésime',
+                subtext: 'Répartition des vins selon leur année de production',
+                left: 'center'
+            },
             tooltip: {},
-            xAxis: { type: 'category', data: fakeData.vintages },
+            xAxis: {
+                type: 'category', data: Object.entries(wineDistributionPerVintage).map(([key]) => {
+                    return key;
+                })
+            },
             yAxis: { type: 'value' },
             series: [
                 {
                     type: 'bar',
-                    data: fakeData.vintages.map(() => Math.floor(Math.random() * 50))
+                    data: Object.entries(wineDistributionPerVintage).map(([_, value]) => {
+                        return value;
+                    })
                 }
             ]
-        },
-        domains: {
+        } : emptyChart(),
+        domains: (wineStatistics && top5Domains) ? {
             title: {
                 text: 'Top 5 Domaines par Nombre de Bouteilles',
+                subtext: 'Classement des domaines en fonction du nombre total de bouteilles disponibles',
                 left: 'center'
             },
             tooltip: {
@@ -261,13 +293,12 @@ async function SetupStatisticsPage() {
                         fontSize: 14,
                         color: '#333'
                     },
-                    data: fakeData.domains.map(d => ({
-                        name: d.name,
-                        value: d.bottles
-                    }))
+                    data: Object.entries(top5Domains).map(([key, value]) => {
+                        return { name: key, value: value };
+                    })
                 }
             ]
-        },
+        } : emptyChart(),
         transactions: (wineTransactions && wineTransactions.data && dates.length > 0) ? {
             title: {
                 text: 'Suivi des Transactions et du Stock de Vins',
@@ -276,31 +307,31 @@ async function SetupStatisticsPage() {
             },
             tooltip: {
                 trigger: 'axis',
-                confine: true, 
+                confine: true,
                 formatter: function (params) {
                     let result = `<div style="padding: 10px; font-family: Arial, sans-serif; font-size: 14px;">`;
-        
+
                     const formattedDate = new Intl.DateTimeFormat('fr-FR').format(new Date(params[0].name));
                     result += `<h4 style="margin: 0; color: #333;">Date: ${formattedDate}</h4><br/>`;
-        
+
                     let stockValue = null;
-        
+
                     params.forEach(param => {
                         if (param.seriesName === 'Stock') {
                             stockValue = param.value;
                         }
                     });
-        
+
                     if (stockValue !== null) {
                         result += `<h4 style="margin: 0; color: #000;">Stock: ${stockValue} bouteilles</h4><br/>`;
                     }
-        
+
                     params.forEach(param => {
                         if (param.seriesName !== 'Stock' && param.value !== 0) {
                             result += `<div style="color: #555;">${param.seriesName}: <strong>${param.value}</strong> bouteilles</div>`;
                         }
                     });
-        
+
                     result += `</div>`;
                     return result;
                 }
@@ -367,7 +398,14 @@ async function SetupStatisticsPage() {
     });
 
     charts.regions.on('click', function (params) {
+        const ancestors = params.treeAncestors;
+        let parentRegion = null;
+
+        if (ancestors && ancestors.length > 1) {
+            parentRegion = ancestors[ancestors.length - 2].name;
+        }
+
         const selectedRegion = params.name ? params.name : (params.nodeData ? params.nodeData.name : "");
-        updateWineTypeChart(selectedRegion);
+        updateWineTypeChart(selectedRegion, parentRegion);
     });
 }
