@@ -367,7 +367,7 @@ async function SetupStatisticsPage() {
                 {
                     name: 'Achats (Cumulatif)',
                     type: 'line',
-                    data: achats
+                    data: achats,
                 },
                 {
                     name: 'Ventes (Cumulatif)',

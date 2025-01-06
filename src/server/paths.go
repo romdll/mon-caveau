@@ -15,8 +15,9 @@ const (
 	ApiWinesFetchTransactions     = ApiBase + "/wines/transactions"
 	ApiWinesFetchStatistics       = ApiBase + "/wines/statistics/raw"
 
-	DebugBase         = "/debug"
-	DebugSqlStructure = DebugBase + "/sql/dump"
+	DebugBase              = "/debug"
+	DebugSqlStructure      = DebugBase + "/sql/dump"
+	DebugCreateFakeAccount = DebugBase + "/fakeit"
 
 	Frontend    = "/v1/*filepath"
 	Favicon     = "/favicon.ico"

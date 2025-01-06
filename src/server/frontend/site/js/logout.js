@@ -1,5 +1,5 @@
 
-document.addEventListener("DOMContentLoaded", async function() {
+document.addEventListener("DOMContentLoaded", async function () {
     const response = await fetch("/api/logout");
     if (response && response.status === 200) {
         document.getElementById("logout-status").innerText = "La déconnexion a réussi.";

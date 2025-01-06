@@ -2,23 +2,23 @@ function generateAccountKey() {
     fetch('/api/register', {
         method: 'GET'
     })
-    .then(response => response.json())
-    .then(data => {
-        const modal = document.getElementById('registerModal');
-        const keyElement = document.getElementById('newAccountKey');
-        keyElement.textContent = `Votre nouvelle clé : ${data.key}`;
-        modal.style.display = 'flex';
+        .then(response => response.json())
+        .then(data => {
+            const modal = document.getElementById('registerModal');
+            const keyElement = document.getElementById('newAccountKey');
+            keyElement.textContent = `Votre nouvelle clé : ${data.key}`;
+            modal.style.display = 'flex';
 
-        document.getElementById('saveKeyButton').onclick = () => {
-            navigator.clipboard.writeText(data.key)
-                .then(() => alert('Clé copiée dans le presse-papiers !'))
-                .catch(() => alert('Échec de la copie de la clé.'));
-        };
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showErrorModal('Échec de la génération de la clé.');
-    });
+            document.getElementById('saveKeyButton').onclick = () => {
+                navigator.clipboard.writeText(data.key)
+                    .then(() => alert('Clé copiée dans le presse-papiers !'))
+                    .catch(() => alert('Échec de la copie de la clé.'));
+            };
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorModal('Échec de la génération de la clé.');
+        });
 }
 
 function offerRedirectIfAlreadyLoggedIn(loggedIn) {
@@ -39,7 +39,7 @@ function showLoggedInModal() {
 
         if (countdown <= 0) {
             clearInterval(countdownInterval);
-            window.location.replace("/v1/dashboard"); 
+            window.location.replace("/v1/dashboard");
         }
     }, 1000);
 }
@@ -48,13 +48,13 @@ function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
 
-document.getElementById('loginForm').addEventListener('submit', function(event) {
+document.getElementById('loginForm').addEventListener('submit', function (event) {
     event.preventDefault();
-    
+
     const accountKey = document.getElementById('account_key').value;
     const rememberMe = document.getElementById('rememberMe').checked;
 
-    const data = { 
+    const data = {
         account_key: accountKey,
         remember_me: rememberMe
     };
@@ -66,20 +66,20 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         },
         body: JSON.stringify(data)
     })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        } else {
-            throw new Error('Clé de compte invalide.');
-        }
-    })
-    .then(data => {
-        showLoggedInModal();
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        showErrorModal(error.message); 
-    });
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Clé de compte invalide.');
+            }
+        })
+        .then(data => {
+            showLoggedInModal();
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            showErrorModal(error.message);
+        });
 });
 
 function showErrorModal(message) {

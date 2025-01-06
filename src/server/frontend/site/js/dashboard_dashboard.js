@@ -6,7 +6,7 @@ function generateColorFromString(str) {
     }
 
     const hue = Math.abs(hash) % 360;
-    const saturation = 70 + (Math.abs(hash) % 30); 
+    const saturation = 70 + (Math.abs(hash) % 30);
     const lightness = 50 + (Math.abs(hash) % 20);
 
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;

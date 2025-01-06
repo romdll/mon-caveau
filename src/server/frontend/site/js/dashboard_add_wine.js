@@ -78,7 +78,7 @@ async function fetchAll() {
 function openHardCreationModal() {
     const form = document.getElementById('wineForm');
     form.reset();
-    
+
     document.getElementById("addHardWineModal").style.display = "flex";
     document.getElementById("addHardWineModal").classList.add('show');
     document.getElementById("addHardWineModal").style.opacity = '1';
@@ -347,9 +347,9 @@ function getRegionData() {
 
     if (regionName && countryName && jsonRegionCountries) {
         const region = jsonRegionCountries.find(item => item.name === regionName && item.country === countryName);
-        return region ? { "id": region.id } : { "name": regionName, "country": countryName }; 
+        return region ? { "id": region.id } : { "name": regionName, "country": countryName };
     }
-    return { "name": regionName, "country": countryName }; 
+    return { "name": regionName, "country": countryName };
 }
 
 function getTypeData() {
@@ -363,23 +363,23 @@ function getBottleSizeData() {
     const bottleSizeValue = parseInt(document.getElementById('bottleSizeValue').value);
     const bottleSize = jsonBottleSizes ? jsonBottleSizes.find(item => item.size === bottleSizeValue) : null;
 
-    return bottleSize ? { "id": bottleSize.id } : { "name": bottleSizeName, "size": bottleSizeValue }; 
+    return bottleSize ? { "id": bottleSize.id } : { "name": bottleSizeName, "size": bottleSizeValue };
 }
 
 async function submitWineForm(event) {
     event.preventDefault();
 
     jsonToSend = {
-        "name": document.getElementById('wineName').value, 
+        "name": document.getElementById('wineName').value,
         "domain": getDomainData(),
         "region": getRegionData(),
-        "type": getTypeData(), 
-        "bottle_size": getBottleSizeData(), 
-        "vintage": parseInt(document.getElementById('vintage').value), 
+        "type": getTypeData(),
+        "bottle_size": getBottleSizeData(),
+        "vintage": parseInt(document.getElementById('vintage').value),
         "quantity": parseInt(document.getElementById('quantity').value),
         "buy_price": parseFloat(document.getElementById('buyPrice').value) || null,
-        "description": document.getElementById('description').value || null, 
-        "image": document.getElementById('image').value || null 
+        "description": document.getElementById('description').value || null,
+        "image": document.getElementById('image').value || null
     };
 
     const response = await fetch("/api/wines/create", {

@@ -23,7 +23,7 @@
                     bord</a></li>
             <li><a href="#" class="sidebar-item" id="collectionLink"><i class="fas fa-cocktail"></i> Collection</a></li>
             <li><a href="#" class="sidebar-item" id="statsLink"><i class="fas fa-chart-line"></i> Statistiques</a></li>
-            <li><a href="#" class="sidebar-item" id="accountLink"><i class="fas fa-user"></i> Paramètres</a></li>
+            <li><a href="#" class="sidebar-item" id="accountLink"><i class="fas fa-user"></i> Compte</a></li>
         </ul>
         <ul class="sidebar-menu-bottom">
             <li><a href="/v1/logout" class="logout" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Se
@@ -228,8 +228,8 @@
         <div id="collectionContent" class="content-section" style="display: none;">
             <button id="addWineButton" class="add-wine-btn" onclick="addWine()"><i
                     class="fa-solid fa-plus"></i></button>
-
             <h2>Collection de Vins</h2>
+            <p>Explorez et gérez votre collection de vins.</p>
 
             <div id="wine-collection">
                 <h3>Voici une vue détaillée de votre collection de vins.</h3>
@@ -278,8 +278,50 @@
         </div>
 
         <div id="accountContent" class="content-section" style="display: none;">
-            <h2>Paramètres de votre compte</h2>
-            <!-- TODO load all the account settings of the user -->
+            <header class="header">
+                <h2>Paramètres de votre compte</h2>
+                <p>Gérez les détails de votre compte et vos sessions actives</p>
+            </header>
+
+            <section id="accountSettings" class="card">
+                <h3>Détails du compte</h3>
+                <div class="form-group">
+                    <label for="accountKey">Clé du compte :</label>
+                    <input type="text" id="accountKey" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="email">Adresse e-mail :</label>
+                    <input type="email" id="email" placeholder="Entrez votre e-mail">
+                </div>
+                <div class="form-group">
+                    <label for="name">Prénom :</label>
+                    <input type="text" id="name" placeholder="Entrez votre prénom">
+                </div>
+                <div class="form-group">
+                    <label for="surname">Nom :</label>
+                    <input type="text" id="surname" placeholder="Entrez votre nom">
+                </div>
+                <button id="saveAccountSettings" class="button-primary">Enregistrer les modifications</button>
+            </section>
+
+            <section id="sessionManagement" class="card">
+                <h3>Sessions actives</h3>
+                <table id="sessionsTable" class="sessions-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Créé le</th>
+                            <th>Dernière activité</th>
+                            <th>Expire le</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dynamic rows will be added here -->
+                    </tbody>
+                </table>
+            </section>
+
             <footer class="footer">
                 <p>&copy; 2025 Mon Caveau. Tous droits réservés.</p>
             </footer>
@@ -293,6 +335,7 @@
     <script src="/v1/js/dashboard_statistics.js"></script>
     <script src="/v1/js/dashboard_add_wine.js"></script>
     <script src="/v1/js/dashboard_collection.js"></script>
+    <script src="/v1/js/dashboard_account.js"></script>
     <script src="/v1/js/dashboard.js"></script>
 </body>
 

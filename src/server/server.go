@@ -57,6 +57,7 @@ func CreateServer() *gin.Engine {
 	// Debug handlers
 	if utils.IsDebugMode() {
 		r.GET(DebugSqlStructure, debug.GET_DatabaseStructure)
+		r.GET(DebugCreateFakeAccount, debug.GET_CreateFakeAccount)
 	}
 
 	return r

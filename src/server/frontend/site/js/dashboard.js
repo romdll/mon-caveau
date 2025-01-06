@@ -1,11 +1,11 @@
-document.getElementById('toggle-btn').addEventListener('click', function() {
+document.getElementById('toggle-btn').addEventListener('click', function () {
     document.getElementById('sidebar').classList.toggle('active');
     this.classList.toggle('open');
 });
 
 function setActiveMenu(selectedLink) {
     const items = document.querySelectorAll('.sidebar-item');
-    items.forEach(item => item.classList.remove('active')); 
+    items.forEach(item => item.classList.remove('active'));
     selectedLink.classList.add('active');
 }
 
@@ -13,7 +13,7 @@ function showSection(sectionId) {
     const sections = document.querySelectorAll('.content-section');
     sections.forEach(section => {
         if (section.id === sectionId) {
-            section.style.display = 'block'; 
+            section.style.display = 'block';
         } else {
             section.style.display = 'none';
         }
@@ -21,7 +21,7 @@ function showSection(sectionId) {
 }
 
 document.querySelectorAll('.sidebar-item').forEach(item => {
-    item.addEventListener('click', async function() {
+    item.addEventListener('click', async function () {
         // TODO ask the user if he is sure to quit while creating a wine
         const addWineModal = document.getElementById("addWineModal");
         const addHardWineModal = document.getElementById("addHardWineModal");
@@ -55,7 +55,7 @@ document.querySelectorAll('.sidebar-item').forEach(item => {
 });
 
 async function fetchSpecificData(sectionId) {
-    switch(sectionId) {
+    switch (sectionId) {
         case 'dashboardContent':
             await SetupDashboardPage();
             break;
@@ -66,6 +66,7 @@ async function fetchSpecificData(sectionId) {
             await SetupStatisticsPage();
             break;
         case 'accountContent':
+            await SetupAccountPage();
             break;
     }
 }
