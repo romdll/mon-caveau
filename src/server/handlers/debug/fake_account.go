@@ -1,9 +1,9 @@
 package debug
 
 import (
-	"math/rand"
 	"moncaveau/database"
 	"moncaveau/database/crypt"
+	"moncaveau/utils"
 	"strings"
 	"time"
 
@@ -14,7 +14,7 @@ func randomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	var output strings.Builder
 	for i := 0; i < length; i++ {
-		randomIndex := rand.Intn(len(charset))
+		randomIndex := utils.SafeIntN(len(charset))
 		output.WriteByte(charset[randomIndex])
 	}
 	return output.String()
@@ -26,7 +26,7 @@ func generateRandomEmail() string {
 
 func generateRandomName() string {
 	names := []string{"Jean", "Alice", "Robert", "Marie", "Sophie", "Daniel", "Emilie", "Christophe", "Sophie", "Valentin", "Thomas", "Guilhem", "Camille", "Lucas", "Alizé"}
-	return names[rand.Intn(len(names))]
+	return names[utils.SafeIntN(len(names))]
 }
 
 func generateRandomWineName() string {
@@ -35,19 +35,19 @@ func generateRandomWineName() string {
 		"Sauvignon Blanc", "Grenache", "Malbec", "Viognier", "Chenin Blanc", "Muscadet", "Tannat",
 		"Carmenère", "Carignan", "Mourvèdre",
 	}
-	return wineNames[rand.Intn(len(wineNames))]
+	return wineNames[utils.SafeIntN(len(wineNames))]
 }
 
 func generateRandomVintage() int {
-	return rand.Intn(30) + 1990
+	return utils.SafeIntN(30) + 1990
 }
 
 func generateRandomQuantity() int {
-	return rand.Intn(100) + 1
+	return utils.SafeIntN(100) + 1
 }
 
 func generateRandomPrice() float64 {
-	return float64(rand.Intn(100) + 10)
+	return float64(utils.SafeIntN(100) + 10)
 }
 
 func ensureWineDomainsExist() []database.WineDomain {
@@ -280,13 +280,13 @@ func GET_CreateFakeAccount(c *gin.Context) {
 	fakeAccount.ID = int(accountId)
 	logger.Infof("Successfully created fake account with ID: %d", fakeAccount.ID)
 
-	for i := 0; i < 20+rand.Intn(10); i++ {
+	for i := 0; i < 20+utils.SafeIntN(10); i++ {
 		fakeWine := &database.WineWine{
 			Name:         generateRandomWineName(),
-			DomainID:     wineDomains[rand.Intn(len(wineDomains))].ID,
-			RegionID:     wineRegions[rand.Intn(len(wineRegions))].ID,
-			TypeID:       wineTypes[rand.Intn(len(wineTypes))].ID,
-			BottleSizeID: wineBottleSizes[rand.Intn(len(wineBottleSizes))].ID,
+			DomainID:     wineDomains[utils.SafeIntN(len(wineDomains))].ID,
+			RegionID:     wineRegions[utils.SafeIntN(len(wineRegions))].ID,
+			TypeID:       wineTypes[utils.SafeIntN(len(wineTypes))].ID,
+			BottleSizeID: wineBottleSizes[utils.SafeIntN(len(wineBottleSizes))].ID,
 			Vintage:      generateRandomVintage(),
 			Quantity:     generateRandomQuantity(),
 			BuyPrice:     generateRandomPrice(),

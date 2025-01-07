@@ -292,12 +292,16 @@ func ApplyMigrations(db *sql.DB) error {
 		logger.Infow("Applying migration", "version", migration.Version)
 
 		if _, err := tx.Exec(migration.SQL); err != nil {
-			tx.Rollback()
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				return fmt.Errorf("failed to apply migration %.01f, and rollback failed: %w", migration.Version, rollbackErr)
+			}
 			return fmt.Errorf("failed to apply migration %.01f: %w", migration.Version, err)
 		}
 
 		if _, err := tx.Exec(`INSERT INTO schema_migrations (version) VALUES (?)`, migration.Version); err != nil {
-			tx.Rollback()
+			if rollbackErr := tx.Rollback(); rollbackErr != nil {
+				return fmt.Errorf("failed to record migration %.01f, and rollback failed: %w", migration.Version, rollbackErr)
+			}
 			return fmt.Errorf("failed to record migration %.01f: %w", migration.Version, err)
 		}
 

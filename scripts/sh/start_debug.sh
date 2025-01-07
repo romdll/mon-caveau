@@ -13,6 +13,6 @@ export DOMAIN_NAME=domain.name
 
 export DEBUG_MODE=true
 
-cd ../src/
+cd ../../src/
 
 go run .

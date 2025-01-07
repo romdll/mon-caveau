@@ -13,7 +13,7 @@ echo "Running gosec..." | tee -a "$OUTPUT_FILE"
 gosec ./... >> "$OUTPUT_FILE"
 
 echo "Running govulncheck..." | tee -a "$OUTPUT_FILE"
-govulncheck ./... >> "$OUTPUT_FILE"
+govulncheck -show verbose ./... >> "$OUTPUT_FILE"
 
 echo "Running staticcheck..." | tee -a "$OUTPUT_FILE"
 staticcheck ./... >> "$OUTPUT_FILE"

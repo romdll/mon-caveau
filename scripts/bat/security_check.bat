@@ -19,6 +19,6 @@ govulncheck ./... >> %OUTPUT_FILE%
 
 echo Running staticcheck...
 echo Running staticcheck... >> %OUTPUT_FILE%
-staticcheck ./... >> %OUTPUT_FILE%
+staticcheck -show verbose ./... >> %OUTPUT_FILE%
 
 echo Security scans completed. Check %OUTPUT_FILE% for details.
