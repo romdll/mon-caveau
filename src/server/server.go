@@ -25,6 +25,7 @@ func CreateServer() *gin.Engine {
 	r.POST(ApiLogin, handlers.POST_VerifyAccountLogin)
 	r.GET(ApiLogout, handlers.GET_Logout)
 	r.GET(ApiRegister, handlers.GET_GenerateAccount)
+	r.GET(ApiAccountDetails, handlers.GET_AccountDetails)
 
 	// || Compiled data
 	r.GET(ApiWinesDashboard, handlers.GET_WinesDashboard)

@@ -25,7 +25,7 @@ func generateRandomEmail() string {
 }
 
 func generateRandomName() string {
-	names := []string{"Jean", "Alice", "Robert", "Marie", "Thomas", "Sophie", "Daniel", "Emilie", "Christophe", "Sophie"}
+	names := []string{"Jean", "Alice", "Robert", "Marie", "Sophie", "Daniel", "Emilie", "Christophe", "Sophie", "Valentin", "Thomas", "Guilhem", "Camille", "Lucas", "Alizé"}
 	return names[rand.Intn(len(names))]
 }
 

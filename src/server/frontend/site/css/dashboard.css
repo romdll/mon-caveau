@@ -159,7 +159,7 @@ body {
 
 .stat-box p {
     font-size: 24px;
-    color: #b85a5a;
+    color: #d63384;
     font-weight: bold;
 }
 
@@ -295,7 +295,7 @@ body {
     right: 30px;
     width: 50px;
     height: 50px;
-    background-color: #b85a5a;
+    background-color: #d63384;
     color: white;
     border: none;
     border-radius: 50%;
@@ -310,7 +310,7 @@ body {
 }
 
 .add-wine-btn:hover {
-    background-color: #8b4d4d;
+    background-color: #b6266d;
 }
 
 .add-wine-btn .text {
@@ -401,7 +401,7 @@ body {
 }
 
 .modal h2 {
-    color: #b85a5a;
+    color: #d63384;
     margin-bottom: 20px;
     font-size: 24px;
     font-weight: bold;
@@ -412,13 +412,13 @@ body {
     top: 10px;
     right: 10px;
     font-size: 28px;
-    color: #b85a5a;
+    color: #d63384;
     cursor: pointer;
     transition: color 0.3s ease;
 }
 
 .close-btn:hover {
-    color: #8b4d4d;
+    color: #b6266d;
 }
 
 .modal-options {
@@ -430,7 +430,7 @@ body {
 .option-btn {
     padding: 12px 20px;
     font-size: 16px;
-    background-color: #b85a5a;
+    background-color: #d63384;
     color: white;
     border: none;
     border-radius: 6px;
@@ -440,7 +440,7 @@ body {
 }
 
 .option-btn:hover {
-    background-color: #8b4d4d;
+    background-color: #b6266d;
 }
 
 .option-btn.disabled {
@@ -472,7 +472,7 @@ body {
 
 .modal button[type="custom"] {
     padding: 14px 24px;
-    background-color: #b85a5a;
+    background-color: #d63384;
     color: #fff;
     font-size: 18px;
     font-weight: 500;
@@ -485,7 +485,7 @@ body {
 }
 
 .modal button[type="custom"]:hover {
-    background-color: #8b4d4d;
+    background-color: #b6266d;
 }
 
 .modal button[type="deletionYes"] {
@@ -541,7 +541,7 @@ body {
 .modal input[type="number"]:focus,
 .modal input[type="url"]:focus,
 .modal textarea:focus {
-    border-color: #b85a5a;
+    border-color: #d63384;
     outline: none;
 }
 
@@ -565,7 +565,7 @@ body {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #b85a5a;
+    background: #d63384;
     cursor: pointer;
     transition: background 0.3s ease;
 }
@@ -574,19 +574,19 @@ body {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #b85a5a;
+    background: #d63384;
     cursor: pointer;
     transition: background 0.3s ease;
 }
 
 .modal input[type="range"]:hover::-webkit-slider-thumb,
 .modal input[type="range"]:active::-webkit-slider-thumb {
-    background: #a04e4e;
+    background: #b6266d;
 }
 
 .modal input[type="range"]:hover::-moz-range-thumb,
 .modal input[type="range"]:active::-moz-range-thumb {
-    background: #a04e4e;
+    background: #b6266d;
 }
 
 .modal input[type="range"]:focus {
@@ -623,7 +623,7 @@ body {
 #toggleMoreFieldsBtn {
     background-color: transparent;
     border: none;
-    color: #b85a5a;
+    color: #d63384;
     cursor: pointer;
     font-size: 16px;
     font-weight: 500;
@@ -634,12 +634,12 @@ body {
 }
 
 #toggleMoreFieldsBtn:hover {
-    color: #8b4d4d;
+    color: #b6266d;
 }
 
 .modal button[type="submit"] {
     padding: 14px 24px;
-    background-color: #b85a5a;
+    background-color: #d63384;
     color: #fff;
     font-size: 18px;
     font-weight: 500;
@@ -652,7 +652,7 @@ body {
 }
 
 .modal button[type="submit"]:hover {
-    background-color: #8b4d4d;
+    background-color: #b6266d;
 }
 
 .suggestion-list {
@@ -681,7 +681,7 @@ body {
 }
 
 .highlight {
-    background-color: #b85a5a;
+    background-color: #d63384;
     color: white;
     padding: 0 4px;
 }

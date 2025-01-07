@@ -13,6 +13,10 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
+var (
+	isServerStartedWithHttp = false
+)
+
 func RunWithQuitNotification(serverEngine *gin.Engine) {
 	logServerStartDetails(serverEngine)
 
@@ -33,6 +37,7 @@ func RunWithQuitNotification(serverEngine *gin.Engine) {
 	}
 
 	if useTLS {
+		isServerStartedWithHttp = true
 		if certFile != "" && keyFile != "" {
 			logger.Info("Using custom TLS certificates")
 			srv.TLSConfig = &tls.Config{

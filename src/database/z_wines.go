@@ -70,8 +70,17 @@ func GetWinesForDashboard(userId int) (int, int, int, int, error) {
 
 func GetWinesCountPerRegion(userId int) (map[string]int, error) {
 	query := `
+		WITH CountryCheck AS (
+			SELECT DISTINCT r.country
+			FROM wine_wines w
+			JOIN wine_regions r ON w.region_id = r.id
+			WHERE w.account_id = ?
+		)
 		SELECT
-			CONCAT(r.name, ' (', r.country, ')') AS region_name,
+			CASE
+				WHEN (SELECT COUNT(*) FROM CountryCheck) > 1 THEN CONCAT(r.name, ' (', r.country, ')')
+				ELSE r.name
+			END AS region_name,
 			SUM(w.quantity) AS total_quantity
 		FROM wine_wines w
 		JOIN wine_regions r ON w.region_id = r.id
@@ -79,7 +88,7 @@ func GetWinesCountPerRegion(userId int) (map[string]int, error) {
 		GROUP BY r.id
 	`
 
-	rows, err := db.Query(query, userId)
+	rows, err := db.Query(query, userId, userId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}

@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"moncaveau/database"
+	"moncaveau/utils"
 	"net/http"
 	"strings"
 
@@ -71,7 +72,7 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 		if !validSessionToken {
 			logger.Warnf("Invalid session token for request: %s", requestUrl)
 
-			c.SetCookie(database.AuthCookieName, "", -1, "/", "", database.IsCookieSecure, true)
+			c.SetCookie(database.AuthCookieName, "", -1, "/", "", utils.IsHttps(), true)
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "Vous n'êtes pas autorisé à accéder à cette page",
 			})

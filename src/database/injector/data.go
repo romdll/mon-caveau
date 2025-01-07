@@ -134,15 +134,15 @@ var (
 	}
 
 	bottleSizes = []database.WineBottleSize{
-		{Size: 375, Name: "Demi-bouteille (37.5 cl)"},
-		{Size: 750, Name: "Bouteille (75 cl)"},
-		{Size: 1500, Name: "Magnum (1.5 L)"},
-		{Size: 3000, Name: "Jéroboam (3 L)"},
-		{Size: 4500, Name: "Réhoboam (4.5 L)"},
-		{Size: 6000, Name: "Mathusalem (6 L)"},
-		{Size: 9000, Name: "Salmanazar (9 L)"},
-		{Size: 12000, Name: "Balthazar (12 L)"},
-		{Size: 15000, Name: "Nabuchodonosor (15 L)"},
-		{Size: 18000, Name: "Melchior (18 L)"},
+		{Size: 375, Name: "Demi-bouteille"},
+		{Size: 750, Name: "Bouteille"},
+		{Size: 1500, Name: "Magnum"},
+		{Size: 3000, Name: "Jéroboam"},
+		{Size: 4500, Name: "Réhoboam"},
+		{Size: 6000, Name: "Mathusalem)"},
+		{Size: 9000, Name: "Salmanazar"},
+		{Size: 12000, Name: "Balthazar)"},
+		{Size: 15000, Name: "Nabuchodonosor"},
+		{Size: 18000, Name: "Melchior"},
 	}
 )

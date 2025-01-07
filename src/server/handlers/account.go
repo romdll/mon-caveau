@@ -3,6 +3,7 @@ package handlers
 import (
 	"moncaveau/database"
 	"moncaveau/database/crypt"
+	"moncaveau/server/middlewares"
 	"moncaveau/utils"
 	"net/http"
 	"time"
@@ -84,7 +85,7 @@ func POST_VerifyAccountLogin(c *gin.Context) {
 				int(time.Until(expirationDate).Seconds()),
 				"/",
 				"",
-				database.IsCookieSecure,
+				utils.IsHttps(),
 				true,
 			)
 			logger.Infof("Session created and cookie set for Account ID: %d", accountId)
@@ -133,5 +134,30 @@ func GET_GenerateAccount(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"key": accountKey,
+	})
+}
+
+func GET_AccountDetails(c *gin.Context) {
+	userId := c.GetInt(middlewares.ContextLoggedInUserId)
+
+	account, err := database.SelectEntityById[database.Account](userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Impossible de récupérer les détails de votre compte dans le systeme.",
+		})
+		return
+	}
+
+	sessions, err := database.GetAllUserSessions(userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Impossible de récupérer les sessions liées a votre compte.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"details":  account,
+		"sessions": sessions,
 	})
 }

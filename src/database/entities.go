@@ -5,13 +5,13 @@ import "time"
 type Account struct {
 	DB_NAME string `db:"accounts" json:"-"`
 
-	ID         int    `db:"id"`
+	ID         int    `db:"id" json:"-"`
 	AccountKey string `db:"account_key" json:"account_key,omitempty"`
 	Email      string `db:"email" json:"email,omitempty"`
 	Password   string `db:"password" json:"password,omitempty"`
-	Name       string `db:"name"`
-	Surname    string `db:"surname"`
-	CreatedAt  string `db:"created_at"`
+	Name       string `db:"name" json:"name"`
+	Surname    string `db:"surname" json:"surname"`
+	CreatedAt  string `db:"created_at" json:"created_at"`
 
 	// Exceptionnal field for login ONLY
 	RememberMe bool `json:"remember_me,omitempty"`
@@ -20,12 +20,12 @@ type Account struct {
 type Session struct {
 	DB_NAME string `db:"sessions" json:"-"`
 
-	ID           int       `db:"id"`
-	AccountID    int       `db:"account_id"`
-	SessionToken string    `db:"session_token"`
-	CreatedAt    time.Time `db:"created_at"`
-	ExpiresAt    time.Time `db:"expires_at"`
-	LastActivity time.Time `db:"last_activity"`
+	ID           int       `db:"id" json:"id"`
+	AccountID    int       `db:"account_id" json:"-"`
+	SessionToken string    `db:"session_token" json:"session_token"`
+	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+	ExpiresAt    time.Time `db:"expires_at" json:"expires_at"`
+	LastActivity time.Time `db:"last_activity" json:"last_activity"`
 }
 
 type WineDomain struct {

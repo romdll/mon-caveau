@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"moncaveau/database"
+	"moncaveau/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +27,7 @@ func GET_Logout(c *gin.Context) {
 		-1,
 		"/",
 		"",
-		database.IsCookieSecure,
+		utils.IsHttps(),
 		true,
 	)
 	c.Status(http.StatusOK)

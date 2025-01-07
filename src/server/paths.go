@@ -5,6 +5,7 @@ const (
 	ApiLogin                      = ApiBase + "/login"
 	ApiLogout                     = ApiBase + "/logout"
 	ApiRegister                   = ApiBase + "/register"
+	ApiAccountDetails             = ApiBase + "/details"
 	ApiWinesDashboard             = ApiBase + "/wines/basic"
 	ApiWinesWineCreation          = ApiBase + "/wines/create"
 	ApiWinesFetchRegionsCountries = ApiBase + "/wines/countries/regions"
