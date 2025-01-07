@@ -65,7 +65,7 @@ async function loadWines(page) {
                     <h4>${wine.name} (${wine.vintage})</h4>
                     <p><strong>Domaine:</strong> ${domainName}</p>
                     <p><strong>Type:</strong> ${typeName}</p>
-                    <p><strong>Région:</strong> ${regionName}</p>
+                    <p><strong>Région / Département:</strong> ${regionName}</p>
                     <p><strong>Taille:</strong> ${bottleSizeName}</p>
                     <p><strong>Quantité:</strong> ${wine.quantity}</p>
                 </div>

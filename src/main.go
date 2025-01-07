@@ -2,6 +2,7 @@ package main
 
 import (
 	"moncaveau/database"
+	"moncaveau/database/injector"
 	"moncaveau/server"
 	"moncaveau/utils"
 )
@@ -20,6 +21,10 @@ func main() {
 
 	if err := database.ApplyMigrations(); err != nil {
 		logger.Fatalf("Failed to apply migrations: %v", err)
+	}
+
+	if err := injector.SetupAndInjectAll(); err != nil {
+		logger.Fatalf("Failed to inject basic data: %v", err)
 	}
 
 	serverEngine := server.CreateServer()

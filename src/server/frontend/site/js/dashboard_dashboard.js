@@ -40,7 +40,7 @@ async function SetupDashboardPage() {
 
     const regionChartOption = regionData.length > 0 ? {
         title: {
-            text: "Répartition des Bouteilles par Région",
+            text: "Répartition des Bouteilles par Région / Département",
             textStyle: {
                 color: '#000000'
             },
