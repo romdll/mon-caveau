@@ -13,6 +13,8 @@ set DOMAIN_NAME=""
 
 set DEBUG_MODE=true
 
+set ACCOUNT_KEY_SECRET="ThisIsForDebugPurposes"
+
 cd ../src/
 
 go run .

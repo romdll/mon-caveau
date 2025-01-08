@@ -13,6 +13,8 @@ export DOMAIN_NAME=domain.name
 
 export DEBUG_MODE=true
 
+export ACCOUNT_KEY_SECRET="ThisIsForDebugPurposes"
+
 cd ../../src/
 
 go run .

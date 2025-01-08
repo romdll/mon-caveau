@@ -74,6 +74,8 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
             }
         })
         .then(data => {
+            const modalHeader = document.querySelector('#loggedInModal .modal-content h2');
+            modalHeader.textContent = `Bienvenue !`;
             showLoggedInModal();
         })
         .catch((error) => {

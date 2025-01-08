@@ -30,7 +30,7 @@ func POST_VerifyAccountLogin(c *gin.Context) {
 	}
 
 	if data.AccountKey != "" && data.Email == "" && data.Password == "" {
-		logger.Infof("Attempting login with AccountKey: %s", data.AccountKey)
+		logger.Infof("Attempting login with AccountKey: %s", utils.MaskOnlyNumbers(data.AccountKey, 8))
 
 		valid, accountId, err := database.CheckIfAccountKeyExists(data.AccountKey)
 		if err != nil {

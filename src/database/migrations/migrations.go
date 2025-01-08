@@ -3,11 +3,15 @@ package migrations
 import (
 	"database/sql"
 	"fmt"
+	"moncaveau/database/crypt"
 )
 
+type CustomMigrationFunc func(db *sql.DB) error
+
 type Migration struct {
-	Version float64
-	SQL     string
+	Version         float64
+	SQL             string
+	CustomMigration CustomMigrationFunc
 }
 
 func ApplyMigrations(db *sql.DB) error {
@@ -252,6 +256,10 @@ func ApplyMigrations(db *sql.DB) error {
 			`,
 			Version: 6.3,
 		},
+		{
+			CustomMigration: crypt.CustomHashAccountKeysMigration,
+			Version:         7.0,
+		},
 	}
 
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version FLOAT PRIMARY KEY)`)
@@ -265,7 +273,7 @@ func ApplyMigrations(db *sql.DB) error {
 		return fmt.Errorf("failed to fetch current schema version: %w", err)
 	}
 
-	logger.Infow("Current schema version", "currentVersion", currentVersion)
+	logger.Infof("Current schema version: %.01f", currentVersion)
 
 	var migrationsToApply []Migration
 	for _, migration := range migrations {
@@ -275,7 +283,7 @@ func ApplyMigrations(db *sql.DB) error {
 	}
 
 	if len(migrationsToApply) == 0 {
-		logger.Infow("No migrations to apply")
+		logger.Info("No migrations to apply")
 		return nil
 	}
 
@@ -289,13 +297,24 @@ func ApplyMigrations(db *sql.DB) error {
 	migrationApplied := false
 	for _, migration := range migrationsToApply {
 		migrationApplied = true
-		logger.Infow("Applying migration", "version", migration.Version)
+		logger.Infof("Applying migration version %.01f", migration.Version)
 
-		if _, err := tx.Exec(migration.SQL); err != nil {
-			if rollbackErr := tx.Rollback(); rollbackErr != nil {
-				return fmt.Errorf("failed to apply migration %.01f, and rollback failed: %w", migration.Version, rollbackErr)
+		if migration.CustomMigration != nil {
+			logger.Infof("Executing custom function for migration version %.01f", migration.Version)
+			if err := migration.CustomMigration(db); err != nil {
+				if rollbackErr := tx.Rollback(); rollbackErr != nil {
+					return fmt.Errorf("failed to apply migration %.01f, and rollback failed: %w", migration.Version, rollbackErr)
+				}
+				return fmt.Errorf("failed to apply custom migration %.01f: %w", migration.Version, err)
 			}
-			return fmt.Errorf("failed to apply migration %.01f: %w", migration.Version, err)
+		} else {
+			logger.Infof("Executing SQL for migration version %.01f", migration.Version)
+			if _, err := tx.Exec(migration.SQL); err != nil {
+				if rollbackErr := tx.Rollback(); rollbackErr != nil {
+					return fmt.Errorf("failed to apply migration %.01f, and rollback failed: %w", migration.Version, rollbackErr)
+				}
+				return fmt.Errorf("failed to apply migration %.01f: %w", migration.Version, err)
+			}
 		}
 
 		if _, err := tx.Exec(`INSERT INTO schema_migrations (version) VALUES (?)`, migration.Version); err != nil {
@@ -305,7 +324,7 @@ func ApplyMigrations(db *sql.DB) error {
 			return fmt.Errorf("failed to record migration %.01f: %w", migration.Version, err)
 		}
 
-		logger.Infow("Migration applied successfully", "version", migration.Version)
+		logger.Infof("Migration version %.01f applied successfully", migration.Version)
 	}
 
 	if migrationApplied {
@@ -313,7 +332,8 @@ func ApplyMigrations(db *sql.DB) error {
 		if err != nil {
 			return fmt.Errorf("failed to commit transaction: %w", err)
 		}
-		logger.Infow("All migrations applied")
+		logger.Info("All migrations applied successfully")
 	}
 	return nil
+
 }
