@@ -63,10 +63,6 @@ async function SetupDashboardPage() {
                 // color: regionColorPalette,
                 label: {
                     formatter: '{b}: {c} ({d}%)',
-                    overflow: 'truncate',
-                    position: 'outer',
-                    alignTo: 'labelLine',
-                    bleedMargin: 5
                 },
                 emphasis: {
                     itemStyle: {
@@ -129,10 +125,6 @@ async function SetupDashboardPage() {
                 // color: typeColorPalette,
                 label: {
                     formatter: '{b}: {c} ({d}%)',
-                    overflow: 'truncate',
-                    position: 'outer',
-                    alignTo: 'labelLine',
-                    bleedMargin: 5
                 },
                 emphasis: {
                     itemStyle: {
