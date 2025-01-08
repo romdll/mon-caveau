@@ -15,6 +15,8 @@ export DEBUG_MODE=true
 
 export ACCOUNT_KEY_SECRET="ThisIsForDebugPurposes"
 
+export ACTIVITY_FLUSH_INTERVAL=10000
+
 cd ../../src/
 
 go run .

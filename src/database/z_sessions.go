@@ -35,7 +35,7 @@ func GetAllUserSessions(userId int) ([]Session, error) {
 		SELECT
 			id,
 			account_id,
-			SUBSTRING(session_token, 1, 8) AS session_token,
+			SUBSTRING(session_token, 1, 14) AS session_token,
 			created_at,
 			expires_at,
 			last_activity
@@ -88,6 +88,30 @@ func GetAllUserSessions(userId int) ([]Session, error) {
 	}
 
 	return sessions, nil
+}
+
+func FlushActivityUpdate(sessions map[string]SessionActivity) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	stmt, err := tx.Prepare("UPDATE sessions SET last_activity = ? WHERE session_token = ?")
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	defer stmt.Close()
+
+	for _, session := range sessions {
+		_, err := stmt.Exec(session.LastActivity, session.SessionToken)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit()
 }
 
 func parseTimeFromBytes(data []byte) (time.Time, error) {

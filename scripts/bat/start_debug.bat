@@ -15,6 +15,8 @@ set DEBUG_MODE=true
 
 set ACCOUNT_KEY_SECRET="ThisIsForDebugPurposes"
 
+set ACTIVITY_FLUSH_INTERVAL=10000
+
 cd ../src/
 
 go run .

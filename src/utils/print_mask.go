@@ -34,3 +34,36 @@ func MaskOnlyNumbers(in string, let int) string {
 
 	return string(masked)
 }
+
+func MaskAll(in string, let int) string {
+	runes := []rune(in)
+
+	visibleCount := 0
+	for _, r := range runes {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			visibleCount++
+		}
+	}
+
+	if visibleCount <= let {
+		return in
+	}
+
+	masked := make([]rune, len(runes))
+	visibleRemaining := visibleCount - let
+
+	for i, r := range runes {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) {
+			if visibleRemaining == 0 {
+				masked[i] = '*'
+			} else {
+				masked[i] = r
+				visibleRemaining--
+			}
+		} else {
+			masked[i] = r
+		}
+	}
+
+	return string(masked)
+}

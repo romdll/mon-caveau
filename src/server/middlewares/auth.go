@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"moncaveau/database"
+	"moncaveau/server/middlewares/activity"
 	"moncaveau/utils"
 	"net/http"
 	"strings"
@@ -14,7 +15,7 @@ const (
 	ContextLoggedInUserId = "UserLoggedInUserId"
 )
 
-func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
+func AuthApi(baseUrls []string, toAvoid []string, activityBuffer *activity.ActivityDoubleBuffer) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestUrl := c.Request.URL.String()
 
@@ -34,6 +35,8 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 				validSessionToken, userID, err := database.VerifyIfSessionExistsAndIsValid(sessionToken)
 				if err == nil && validSessionToken {
 					logger.Debugf("Authenticated successfully for request (no hard check): %s", requestUrl)
+					activityBuffer.Write(sessionToken)
+
 					c.Set(ContextIsLoggedIn, true)
 					c.Set(ContextLoggedInUserId, userID)
 				}
@@ -80,6 +83,8 @@ func AuthApi(baseUrls []string, toAvoid []string) gin.HandlerFunc {
 		}
 
 		logger.Infof("Authenticated successfully for request: %s", requestUrl)
+		activityBuffer.Write(sessionToken)
+
 		c.Set(ContextIsLoggedIn, true)
 		c.Set(ContextLoggedInUserId, userID)
 		c.Next()

@@ -84,6 +84,10 @@ func RunWithQuitNotification(serverEngine *gin.Engine) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	logger.Info("Shutting down all registered shutdown handlers...")
+	GracefulShutdownRegistry.TriggerShutdowns()
+	logger.Info("Successfully triggered all registered shutdown channels.")
+
 	if err := srv.Shutdown(ctx); err != nil {
 		logger.Fatalf("Server shutdown failed: %v", err)
 	}

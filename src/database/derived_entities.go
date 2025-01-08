@@ -23,3 +23,8 @@ type WineTransactionForChart struct {
 	Type     string    `json:"type"`
 	Date     time.Time `json:"date"`
 }
+
+type SessionActivity struct {
+	SessionToken string
+	LastActivity time.Time
+}

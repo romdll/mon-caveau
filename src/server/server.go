@@ -5,6 +5,7 @@ import (
 	"moncaveau/server/handlers"
 	"moncaveau/server/handlers/debug"
 	"moncaveau/server/middlewares"
+	"moncaveau/server/middlewares/activity"
 	"moncaveau/utils"
 	"net/http"
 
@@ -12,13 +13,15 @@ import (
 )
 
 func CreateServer() *gin.Engine {
+	activityBuffer := activity.SetupActivityBuffer()
+
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 
 	// Attach middlewares
 	r.Use(middlewares.Logger())
 	r.Use(gin.Recovery())
-	r.Use(middlewares.AuthApi(AuthProtectedPages, AuthAvoidPages))
+	r.Use(middlewares.AuthApi(AuthProtectedPages, AuthAvoidPages, activityBuffer))
 
 	// Attach handlers
 	// || Auth
