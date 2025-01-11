@@ -122,7 +122,9 @@ func GET_GenerateAccount(c *gin.Context) {
 
 	logger.Infof("Generated new secure account key: %s", utils.MaskOnlyNumbers(accountKey, 6))
 
-	if _, err := database.InsertEntityById(&database.Account{AccountKey: accountKey}); err != nil {
+	encryptedAccountKey := crypt.HashAccountKey(accountKey)
+
+	if _, err := database.InsertEntityById(&database.Account{AccountKey: encryptedAccountKey}); err != nil {
 		logger.Errorf("Error inserting new account into the database: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Impossible de créer un nouveau compte dans le système.",

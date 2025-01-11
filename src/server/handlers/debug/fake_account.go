@@ -248,6 +248,8 @@ func GET_CreateFakeAccount(c *gin.Context) {
 		return
 	}
 
+	encryptedAccountKey := crypt.HashAccountKey(accountKey)
+
 	logger.Infof("Generated account key for new fake account: %s", accountKey)
 
 	wineDomains := ensureWineDomainsExist()
@@ -256,7 +258,7 @@ func GET_CreateFakeAccount(c *gin.Context) {
 	wineBottleSizes := ensureWineBottleSizesExist()
 
 	fakeAccount := &database.Account{
-		AccountKey: accountKey,
+		AccountKey: encryptedAccountKey,
 		Email:      generateRandomEmail(),
 		Name:       generateRandomName(),
 		Surname:    generateRandomName(),
