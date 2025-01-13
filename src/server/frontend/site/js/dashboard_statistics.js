@@ -22,7 +22,7 @@ function processCumulativeTransactions(transactions, accountCreationDate) {
 
         if (tx.type === "added") groupedData[date].added += tx.quantity;
         if (tx.type === "removed") groupedData[date].removed += tx.quantity;
-        if (tx.type === "drunk") groupedData[date].drunk += tx.quantity;
+        if (tx.type === "drank") groupedData[date].drunk += tx.quantity;
         groupedData[date].stock += tx.quantity;
     });
 
@@ -287,10 +287,10 @@ async function SetupStatisticsPage() {
             series: [
                 {
                     type: 'pie',
-                    radius: ['40%', '70%'],
+                    radius: ['25%', '35%'],
                     label: {
                         formatter: '{b} ({c})',
-                        fontSize: 14,
+                        fontSize: 12,
                         color: '#333'
                     },
                     data: Object.entries(top5Domains).map(([key, value]) => {

@@ -369,6 +369,26 @@ function getBottleSizeData() {
 async function submitWineForm(event) {
     event.preventDefault();
 
+    const startDate = document.getElementById("preferredStartDate").value;
+    const endDate = document.getElementById("preferredEndDate").value;
+
+    if ((startDate && !endDate) || (!startDate && endDate)) {
+        alert("Les champs 'Date de Début' et 'Date de Fin' doivent être remplis si un des champs est fournie.");
+        event.preventDefault();
+        return false;
+    }
+
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (start > end) {
+            alert("'Date de Début' ne peut pas être après 'Date de Fin'.");
+            event.preventDefault();
+            return false;
+        }
+    }
+
     jsonToSend = {
         "name": document.getElementById('wineName').value,
         "domain": getDomainData(),
@@ -379,7 +399,9 @@ async function submitWineForm(event) {
         "quantity": parseInt(document.getElementById('quantity').value),
         "buy_price": parseFloat(document.getElementById('buyPrice').value) || null,
         "description": document.getElementById('description').value || null,
-        "image": document.getElementById('image').value || null
+        "image": document.getElementById('image').value || null,
+        "preferred_start_date": document.getElementById('preferredStartDate').value || null,
+        "preferred_end_date": document.getElementById('preferredEndDate').value || null
     };
 
     const response = await fetch("/api/wines/create", {
@@ -389,10 +411,11 @@ async function submitWineForm(event) {
         },
         body: JSON.stringify(jsonToSend)
     });
+
     if (response.status === 200) {
         closeHardCreationModal();
+        refresh();
     } else {
         console.log(response);
-        console.log(await response.json());
     }
 }

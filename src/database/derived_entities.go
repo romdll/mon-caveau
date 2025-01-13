@@ -16,6 +16,9 @@ type WineCreation struct {
 	BuyPrice    float64 `json:"buy_price,omitempty"`
 	Description string  `json:"description,omitempty"`
 	Image       string  `json:"image,omitempty"`
+
+	PreferredStartDate string `json:"preferred_start_date,omitempty"`
+	PreferredEndDate   string `json:"preferred_end_date,omitempty"`
 }
 
 type WineTransactionForChart struct {

@@ -61,18 +61,20 @@ type WineBottleSize struct {
 type WineWine struct {
 	DB_NAME string `db:"wine_wines" json:"-"`
 
-	ID           int     `db:"id" json:"id"`
-	Name         string  `db:"name" json:"name"`
-	DomainID     int     `db:"domain_id" json:"domain_id"`
-	RegionID     int     `db:"region_id" json:"region_id"`
-	TypeID       int     `db:"type_id" json:"type_id"`
-	BottleSizeID int     `db:"bottle_size_id" json:"bottle_size_id"`
-	Vintage      int     `db:"vintage" json:"vintage"`
-	Quantity     int     `db:"quantity" json:"quantity"`
-	BuyPrice     float64 `db:"buy_price" json:"buy_price"`
-	Description  string  `db:"description" json:"description"`
-	Image        string  `db:"image" json:"image"`
-	AccountID    int     `db:"account_id" json:"account_id"`
+	ID                 int     `db:"id" json:"id"`
+	Name               string  `db:"name" json:"name"`
+	DomainID           int     `db:"domain_id" json:"domain_id"`
+	RegionID           int     `db:"region_id" json:"region_id"`
+	TypeID             int     `db:"type_id" json:"type_id"`
+	BottleSizeID       int     `db:"bottle_size_id" json:"bottle_size_id"`
+	Vintage            int     `db:"vintage" json:"vintage"`
+	Quantity           int     `db:"quantity" json:"quantity"`
+	BuyPrice           float64 `db:"buy_price" json:"buy_price"`
+	Description        string  `db:"description" json:"description"`
+	Image              string  `db:"image" json:"image"`
+	AccountID          int     `db:"account_id" json:"account_id"`
+	PreferredStartDate *string `db:"preferred_start_date" json:"preferred_start_date,omitempty"`
+	PreferredEndDate   *string `db:"preferred_end_date" json:"preferred_end_date,omitempty"`
 }
 
 type WineTransaction struct {

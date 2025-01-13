@@ -23,7 +23,7 @@
                     bord</a></li>
             <li><a href="#" class="sidebar-item" id="collectionLink"><i class="fas fa-cocktail"></i> Collection</a></li>
             <li><a href="#" class="sidebar-item" id="statsLink"><i class="fas fa-chart-line"></i> Statistiques</a></li>
-            <li><a href="#" class="sidebar-item" id="accountLink"><i class="fas fa-user"></i> Compte</a></li>
+            <li><a href="#" class="sidebar-item disabled" id="accountLink"><i class="fas fa-user"></i> Compte</a></li>
         </ul>
         <ul class="sidebar-menu-bottom">
             <li><a href="/v1/logout" class="logout" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Se
@@ -74,7 +74,7 @@
                     <button type="deletionNo" onclick="closeDeleteModal()">Non</button>
                 </div>
             </div>
-            <p id="semi-footer">Cette action est irréversible.</p>
+            <p id="semi-footer">Cette action est irréversible. (Supression d'un vin = quantité à 0)</p>
         </div>
     </div>
 
@@ -167,6 +167,17 @@
                     <div class="input-item">
                         <label for="image">URL de l'Image</label>
                         <input type="url" id="image" name="image" placeholder="https://exemple.com/image.jpg">
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-item">
+                            <label for="preferredStartDate">Date de Début de Consommation Préférée</label>
+                            <input type="date" id="preferredStartDate" name="preferredStartDate">
+                        </div>
+                        <div class="input-item">
+                            <label for="preferredEndDate">Date de Fin de Consommation Préférée</label>
+                            <input type="date" id="preferredEndDate" name="preferredEndDate">
+                        </div>
                     </div>
                 </div>
 

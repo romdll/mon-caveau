@@ -1,3 +1,9 @@
+let activeSub = null;
+
+function refresh() {
+    activeSub.click();
+}
+
 document.getElementById('toggle-btn').addEventListener('click', function () {
     document.getElementById('sidebar').classList.toggle('active');
     this.classList.toggle('open');
@@ -7,6 +13,7 @@ function setActiveMenu(selectedLink) {
     const items = document.querySelectorAll('.sidebar-item');
     items.forEach(item => item.classList.remove('active'));
     selectedLink.classList.add('active');
+    activeSub = selectedLink;
 }
 
 function showSection(sectionId) {

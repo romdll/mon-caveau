@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"moncaveau/database"
 	"moncaveau/database/transformers"
 	"moncaveau/server/middlewares"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -62,6 +64,30 @@ func GET_WinesDashboard(c *gin.Context) {
 			"winesIdToName": winesIdToName,
 		},
 	})
+}
+
+func validateDrinkingDates(startDate, endDate string) error {
+	const layout = "2006-01-02"
+
+	start, err := time.Parse(layout, startDate)
+	if err != nil {
+		return fmt.Errorf("invalid start date: %v", err)
+	}
+
+	end, err := time.Parse(layout, endDate)
+	if err != nil {
+		return fmt.Errorf("invalid end date: %v", err)
+	}
+
+	if start.Equal(end) {
+		return errors.New("start date and end date cannot be the same")
+	}
+
+	if start.After(end) {
+		return errors.New("start date cannot be after end date")
+	}
+
+	return nil
 }
 
 func POST_CreateWine(c *gin.Context) {
@@ -221,6 +247,13 @@ func POST_CreateWine(c *gin.Context) {
 		return
 	}
 
+	if data.PreferredStartDate != "" && data.PreferredEndDate != "" && validateDrinkingDates(data.PreferredStartDate, data.PreferredEndDate) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni des dates de consommation invalide.",
+		})
+		return
+	}
+
 	// TODO verify all the sub ids to make sure they exists
 
 	userId := c.GetInt(middlewares.ContextLoggedInUserId)
@@ -228,7 +261,16 @@ func POST_CreateWine(c *gin.Context) {
 	realWine.AccountID = userId
 
 	_, err := database.InsertEntityById(realWine)
-	fmt.Println(err)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Impossible de créer votre vin.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+	})
 }
 
 func GET_allWines(c *gin.Context) {
@@ -338,5 +380,95 @@ func GET_wineStatisticsData(c *gin.Context) {
 		"wineDistributionPerVintage":     wineDistributionPerVintage,
 		"wineTypesDistributionPerRegion": wineTypesDistributionPerRegion,
 		"userUsedRegionsWithBottlecount": userUsedRegionsWithBottlecount,
+	})
+}
+
+func POST_AdjustQuantity(c *gin.Context) {
+	wineID, err := strconv.Atoi(c.Param("id"))
+	if err != nil || wineID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Identifiant de vin invalide.",
+		})
+		return
+	}
+
+	var req AdjustQuantityRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "L'ajustement de quantité est impossible avec les données fournies.",
+		})
+		return
+	}
+
+	wine, err := database.SelectEntityById[database.WineWine](wineID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Identifiant de vin invalide.",
+		})
+		return
+	}
+
+	userId := c.GetInt(middlewares.ContextLoggedInUserId)
+	if wine.AccountID != userId {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous essayez de modifié un vin qui n'est pas a vous.",
+		})
+		return
+	}
+
+	wine.Quantity += req.Change
+
+	if wine.Quantity < 0 {
+		wine.Quantity = 0
+	}
+
+	_, err = database.UpdateEntityById(wine)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Impossible de mettre a jour la quantité de bouteilles.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"quantity": wine.Quantity})
+}
+
+func DELETE_deleteWine(c *gin.Context) {
+	wineID, err := strconv.Atoi(c.Param("id"))
+	if err != nil || wineID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Identifiant de vin invalide.",
+		})
+		return
+	}
+
+	wine, err := database.SelectEntityById[database.WineWine](wineID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Identifiant de vin invalide.",
+		})
+		return
+	}
+
+	userId := c.GetInt(middlewares.ContextLoggedInUserId)
+	if wine.AccountID != userId {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous essayez de suprimé un vin qui n'est pas a vous.",
+		})
+		return
+	}
+
+	wine.Quantity = 0
+
+	_, err = database.UpdateEntityById(wine)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Impossible de mettre a jour la quantité de bouteilles.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
 	})
 }

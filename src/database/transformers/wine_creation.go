@@ -21,5 +21,13 @@ func ToWineWineEntity(entry database.WineCreation) database.WineWine {
 	entity.Description = entry.Description
 	entity.Image = entry.Image
 
+	if entry.PreferredStartDate != "" {
+		entity.PreferredStartDate = &entry.PreferredStartDate
+	}
+
+	if entry.PreferredEndDate != "" {
+		entity.PreferredEndDate = &entry.PreferredEndDate
+	}
+
 	return entity
 }

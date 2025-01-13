@@ -58,6 +58,16 @@ body {
     border-left: 4px solid transparent; 
 }
 
+.sidebar-item.disabled {
+    background-color: #797979 !important;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.sidebar-item.disabled:hover {
+    background-color: #797979 !important;
+}
+
 .sidebar-item:hover {
     background-color: #444; 
     color: #d63384;
@@ -460,6 +470,7 @@ body {
 .modal input[type="text"],
 .modal input[type="number"],
 .modal input[type="url"],
+.modal input[type="date"],
 .modal textarea {
     width: 100%;
     padding: 12px;
@@ -705,8 +716,8 @@ body {
 }
 
 .wine-item {
-    flex: 1 1 calc(25% - 20px); 
-    max-width: calc(25% - 20px);
+    flex: 1 1 calc(33.33% - 20px); 
+    max-width: calc(33.33% - 20px);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -717,6 +728,34 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease-in-out;
     overflow: hidden;
+    position: relative;
+    padding-top: 50px;
+}
+
+.quantity-updated {
+    background-color: #ffeb3b;
+    transition: background-color 0.5s ease-in-out;
+}
+
+.wine-item.wine-inactive {
+    opacity: 0.5;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.wine-item.wine-inactive .wine-info h4 {
+    color: #721c24;
+}
+
+.wine-item .wine-badge {
+    display: inline-block;
+    background-color: #dc3545;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    text-align: center;
 }
 
 .wine-item img {
@@ -741,6 +780,39 @@ body {
 .wine-item-actions {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.wine-item-actions button {
+    flex: 1;
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.wine-item-actions button.edit {
+    background-color: #0033eb;
+}
+
+.wine-item-actions button.edit:hover {
+    background-color: #0024a8;
+    transform: scale(1.01);
+}
+
+.wine-item-actions button.delete {
+    background-color: #fa2819;
+}
+
+.wine-item-actions button.delete:hover {
+    background-color: #d41b0d;
+    transform: scale(1.01);
 }
 
 .wine-item button {
@@ -756,22 +828,6 @@ body {
 .wine-item button:disabled {
     background-color: #797979 !important;
     cursor: not-allowed;
-}
-
-.wine-item button.edit {
-    background-color: #ff9800;
-}
-
-.wine-item button.edit:hover {
-    background-color: #f57c00;
-}
-
-.wine-item button.delete {
-    background-color: #f44336;
-}
-
-.wine-item button.delete:hover {
-    background-color: #e53935;
 }
 
 .pagination {
@@ -835,6 +891,60 @@ body {
 
 #pagination button:hover {
     background-color: #0056b3;
+}
+
+.wine-item.highlight-preferred {
+    border: 2px solid #4caf50; 
+    background-color: #e8f5e9;
+}
+
+.wine-badge.preferred-badge {
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.quick-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    z-index: 200;
+    gap: 5px;
+}
+
+.quick-actions button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.quick-actions button.increment {
+    background-color: #28a745;
+}
+
+.quick-actions button.increment:hover {
+    background-color: #218838;
+}
+
+.quick-actions button.decrement {
+    background-color: #dc3545;
+}
+
+.quick-actions button.decrement:hover {
+    background-color: #c82333;
 }
 
 #wine-collection {

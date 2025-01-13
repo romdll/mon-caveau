@@ -260,6 +260,14 @@ func ApplyMigrations(db *sql.DB) error {
 			CustomMigration: crypt.CustomHashAccountKeysMigration,
 			Version:         7.0,
 		},
+		{
+			SQL: `
+				ALTER TABLE wine_wines
+				ADD COLUMN preferred_start_date DATE NULL,
+				ADD COLUMN preferred_end_date DATE NULL;
+			`,
+			Version: 8.0,
+		},
 	}
 
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (version FLOAT PRIMARY KEY)`)

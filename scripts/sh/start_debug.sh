@@ -15,7 +15,7 @@ export DEBUG_MODE=true
 
 export ACCOUNT_KEY_SECRET="ThisIsForDebugPurposes"
 
-export ACTIVITY_FLUSH_INTERVAL=10000
+export ACTIVITY_FLUSH_INTERVAL=120000
 
 cd ../../src/
 
