@@ -1,3 +1,4 @@
 security_report.txt
 scripts/*.json
 scripts/*.prepared
+src/bin/*
