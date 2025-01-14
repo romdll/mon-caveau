@@ -161,7 +161,7 @@ async function SetupStatisticsPage() {
 
     const { top5Domains, wineDistributionPerVintage, wineTypesDistributionPerRegion, userUsedRegionsWithBottlecount } = wineStatistics;
 
-    const groupedByCountry = userUsedRegionsWithBottlecount.reduce((acc, { region, bottle_count }) => {
+    const groupedByCountry = userUsedRegionsWithBottlecount ? userUsedRegionsWithBottlecount.reduce((acc, { region, bottle_count }) => {
         const { country, name } = region;
 
         if (!acc[country]) {
@@ -171,14 +171,14 @@ async function SetupStatisticsPage() {
         acc[country].push({ name, value: bottle_count });
 
         return acc;
-    }, {});
+    }, {}) : {};
 
     const regionHierarchy = Object.entries(groupedByCountry).map(([country, regions]) => ({
         name: country,
         children: regions
     }));
 
-    wineTypeByRegion = wineTypesDistributionPerRegion.reduce((acc, { region, wine_types }) => {
+    wineTypeByRegion = wineTypesDistributionPerRegion ? wineTypesDistributionPerRegion.reduce((acc, { region, wine_types }) => {
         const { country, name: regionName } = region;
 
         if (!acc[country]) {
@@ -198,7 +198,7 @@ async function SetupStatisticsPage() {
         });
 
         return acc;
-    }, {});
+    }, {}) : {};
 
     const options = {
         wineTypes: (wineStatistics && wineTypesDistributionPerRegion) ? {

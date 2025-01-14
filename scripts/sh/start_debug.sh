@@ -12,6 +12,7 @@ export KEY_FILE=""
 export DOMAIN_NAME=domain.name
 
 export DEBUG_MODE=true
+export USE_FILESYSTEM_FRONTEND=true
 
 export ACCOUNT_KEY_SECRET="ThisIsForDebugPurposes"
 

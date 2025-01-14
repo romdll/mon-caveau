@@ -12,6 +12,7 @@ set KEY_FILE=""
 set DOMAIN_NAME=""
 
 set DEBUG_MODE=true
+set USE_FILESYSTEM_FRONTEND=true
 
 set ACCOUNT_KEY_SECRET="ThisIsForDebugPurposes"
 

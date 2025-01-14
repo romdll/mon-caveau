@@ -31,7 +31,7 @@ func ServeFrontendFiles(c *gin.Context) {
 		filePath = "index.html"
 	}
 
-	if utils.IsDebugMode() {
+	if utils.UseFileSystemForFrontend() {
 		logger.Infow("Debug mode is enabled, serving from file system.")
 		serveFromFileSystem(c, filePath)
 	} else {
