@@ -34,14 +34,20 @@ compile_regular:
 compile_versioned:
   stage: build
   script:
+    - apt-get update && apt-get install -y sshpass
     - cd src
     - mkdir -p mybinaries
     - go mod tidy
-    - VERSION="v$(git describe --tags --always --abbrev=7)" 
+    - VERSION="v$(git describe --tags --always --abbrev=7)"
     - echo "Versioned Build - Building with version - $VERSION"
-    - go build -ldflags "-X version.Version=$VERSION" -o mybinaries ./...
+    - go build -ldflags "-X version.Version=$VERSION" -o mybinaries/myapp
+    - echo "Uploading the binary to VPS"
+    - >
+      sshpass -p "$VPS_PASSWORD" ssh $VPS_USER@$VPS_IP "mkdir -p /moncaveau/gitlab_uploads/$VERSION/"
+    - >
+      sshpass -p "$VPS_PASSWORD" scp mybinaries/myapp $VPS_USER@$VPS_IP:/moncaveau/gitlab_uploads/$VERSION/
   artifacts:
     paths:
-      - src/mybinaries/moncaveau
+      - src/mybinaries/myapp
     expire_in: 1 week
   when: manual
