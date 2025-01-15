@@ -105,74 +105,76 @@ async function loadWines(page) {
         const { wines, total } = data;
         totalWines = total;
 
-        wines.forEach((wine, index) => {
-            const domainName = jsonDomains.find(domain => domain.id === wine.domain_id)?.name || "Unknown Domain";
-            const typeName = jsonTypes.find(type => type.id === wine.type_id)?.name || "Unknown Type";
-            const region = jsonRegionCountries.find(region => region.id === wine.region_id);
-            const regionName = region ? region.name : "Unknown Region";
-            const countryName = region ? region.country : "Unknown Country";
-            const bottleSize = jsonBottleSizes.find(size => size.id === wine.bottle_size_id);
-            const bottleSizeName = bottleSize ? `${bottleSize.name} (${bottleSize.size} ml)` : "Unknown Size";
+        if (wines) {
+            wines.forEach((wine, index) => {
+                const domainName = jsonDomains.find(domain => domain.id === wine.domain_id)?.name || "Unknown Domain";
+                const typeName = jsonTypes.find(type => type.id === wine.type_id)?.name || "Unknown Type";
+                const region = jsonRegionCountries.find(region => region.id === wine.region_id);
+                const regionName = region ? region.name : "Unknown Region";
+                const countryName = region ? region.country : "Unknown Country";
+                const bottleSize = jsonBottleSizes.find(size => size.id === wine.bottle_size_id);
+                const bottleSizeName = bottleSize ? `${bottleSize.name} (${bottleSize.size} ml)` : "Unknown Size";
+    
+                const isInactive = wine.quantity === 0;
+    
+                const today = new Date();
+                const currentYear = today.getFullYear();
+    
+                const startDate = wine.preferred_start_date ? new Date(wine.preferred_start_date) : null;
+                const endDate = wine.preferred_end_date ? new Date(wine.preferred_end_date) : null;
+    
+                const startYear = startDate ? startDate.getFullYear() : null;
+                const endYear = endDate ? endDate.getFullYear() : null;
+    
+                const isWithinPreferredDates = startYear && endYear && currentYear >= startYear && currentYear <= endYear;
+    
+                const wineItem = document.createElement('div');
+                wineItem.classList.add('wine-item');
+                if (isInactive) {
+                    wineItem.classList.add('wine-inactive');
+                }
+                if (isWithinPreferredDates) {
+                    wineItem.classList.add('highlight-preferred');
+                }
+    
+                let dateInfo = '';
+                if (startYear || endYear) {
+                    dateInfo = `
+                        <p><strong>Dates Préférées:</strong>
+                            ${startYear ? `À partir de ${startYear}` : ''}
+                            ${endYear ? ` jusqu'en ${endYear}` : ''}
+                        </p>`;
+                }
+    
+                wineItem.innerHTML = `
+                    <div class="quick-actions">
+                        <button class="decrement" onclick="adjustQuantity(${wine.id}, -1)" ${isInactive ? "disabled" : ""}>-1</button>
+                        <button class="increment" onclick="adjustQuantity(${wine.id}, 1)">+1</button>
+                    </div>
+                    <img src="${wine.image || '/v1/images/no_photo_generic.svg'}" alt="Image of ${wine.name}" onerror="this.src='/v1/images/no_photo_generic.svg';">
+                    <div class="wine-info">
+                        <h4>${wine.name} (${wine.vintage})</h4>
+                        <p><strong>Domaine:</strong> ${domainName}</p>
+                        <p><strong>Type:</strong> ${typeName}</p>
+                        <p><strong>Région / Département:</strong> ${regionName}</p>
+                        <p><strong>Pays:</strong> ${countryName}</p>
+                        <p><strong>Taille:</strong> ${bottleSizeName}</p>
+                        <p><strong>Quantité:</strong> <span class="quantity" data-id="${wine.id}">${wine.quantity}</span></p>
+                        ${dateInfo}
+                    </div>
+                    <div class="wine-item-actions">
+                        <button class="edit" onclick="editWine(${wine.id})" ${isInactive ? "disabled" : ""}>Modifier</button>
+                        <button class="delete" onclick="askDeleteWine(${wine.id})" ${wine.quantity === 0 ? "disabled" : ""}>Supprimer</button>
+                    </div>
+                    ${isInactive ? `<span class="wine-badge">Vin Inactif</span>` : ``}
+                    ${isWithinPreferredDates ? `<span class="wine-badge preferred-badge">Dates Préférées Actives</span>` : ``}
+                `;
+    
+                placeholders[index].replaceWith(wineItem);
+            });
+        }
 
-            const isInactive = wine.quantity === 0;
-
-            const today = new Date();
-            const currentYear = today.getFullYear();
-
-            const startDate = wine.preferred_start_date ? new Date(wine.preferred_start_date) : null;
-            const endDate = wine.preferred_end_date ? new Date(wine.preferred_end_date) : null;
-
-            const startYear = startDate ? startDate.getFullYear() : null;
-            const endYear = endDate ? endDate.getFullYear() : null;
-
-            const isWithinPreferredDates = startYear && endYear && currentYear >= startYear && currentYear <= endYear;
-
-            const wineItem = document.createElement('div');
-            wineItem.classList.add('wine-item');
-            if (isInactive) {
-                wineItem.classList.add('wine-inactive');
-            }
-            if (isWithinPreferredDates) {
-                wineItem.classList.add('highlight-preferred');
-            }
-
-            let dateInfo = '';
-            if (startYear || endYear) {
-                dateInfo = `
-                    <p><strong>Dates Préférées:</strong>
-                        ${startYear ? `À partir de ${startYear}` : ''}
-                        ${endYear ? ` jusqu'en ${endYear}` : ''}
-                    </p>`;
-            }
-
-            wineItem.innerHTML = `
-                <div class="quick-actions">
-                    <button class="decrement" onclick="adjustQuantity(${wine.id}, -1)" ${isInactive ? "disabled" : ""}>-1</button>
-                    <button class="increment" onclick="adjustQuantity(${wine.id}, 1)">+1</button>
-                </div>
-                <img src="${wine.image || '/v1/images/no_photo_generic.svg'}" alt="Image of ${wine.name}" onerror="this.src='/v1/images/no_photo_generic.svg';">
-                <div class="wine-info">
-                    <h4>${wine.name} (${wine.vintage})</h4>
-                    <p><strong>Domaine:</strong> ${domainName}</p>
-                    <p><strong>Type:</strong> ${typeName}</p>
-                    <p><strong>Région / Département:</strong> ${regionName}</p>
-                    <p><strong>Pays:</strong> ${countryName}</p>
-                    <p><strong>Taille:</strong> ${bottleSizeName}</p>
-                    <p><strong>Quantité:</strong> <span class="quantity" data-id="${wine.id}">${wine.quantity}</span></p>
-                    ${dateInfo}
-                </div>
-                <div class="wine-item-actions">
-                    <button class="edit" onclick="editWine(${wine.id})" ${isInactive ? "disabled" : ""}>Modifier</button>
-                    <button class="delete" onclick="askDeleteWine(${wine.id})" ${wine.quantity === 0 ? "disabled" : ""}>Supprimer</button>
-                </div>
-                ${isInactive ? `<span class="wine-badge">Vin Inactif</span>` : ``}
-                ${isWithinPreferredDates ? `<span class="wine-badge preferred-badge">Dates Préférées Actives</span>` : ``}
-            `;
-
-            placeholders[index].replaceWith(wineItem);
-        });
-
-        if (wines.length < placeholders.length) {
+        if (wines && wines.length < placeholders.length) {
             placeholders.slice(wines.length).forEach(placeholder => placeholder.remove());
         }
 
