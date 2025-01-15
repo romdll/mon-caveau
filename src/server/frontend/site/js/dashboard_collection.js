@@ -176,6 +176,8 @@ async function loadWines(page) {
 
         if (wines && wines.length < placeholders.length) {
             placeholders.slice(wines.length).forEach(placeholder => placeholder.remove());
+        } else if (!wines) {
+            placeholders.forEach(placeholder => placeholder.remove());
         }
 
         setupPagination();
