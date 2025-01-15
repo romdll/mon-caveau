@@ -6,22 +6,30 @@ import (
 	"strings"
 )
 
-func GetWinesWithPaginationAndSearch(limit, page, userId int, searchQuery string) ([]WineWine, error) {
+func GetWinesWithPaginationAndSearch(limit, page, userId int, searchQuery string, filterPreferredDates bool) ([]WineWine, int, error) {
 	if limit <= 0 || page <= 0 {
 		logger.Errorw("Invalid limit or page", "limit", limit, "page", page)
-		return nil, fmt.Errorf("invalid limit or page: both must be greater than zero")
+		return nil, 0, fmt.Errorf("invalid limit or page: both must be greater than zero")
 	}
 
-	logger.Infow("Fetching entities from table", "limit", limit, "page", page, "searchQuery", searchQuery)
+	logger.Infow("Fetching entities from table", "limit", limit, "page", page, "searchQuery", searchQuery, "filterPreferredDates", filterPreferredDates)
 
 	dbName, _, err := entityToMap(new(WineWine))
 	if err != nil {
 		logger.Errorw("Error in entityToMap", "error", err)
-		return nil, err
+		return nil, 0, err
 	}
 
 	queryBase := "SELECT * FROM " + dbName + " WHERE account_id = ?"
+	countQuery := "SELECT COUNT(*) FROM " + dbName + " WHERE account_id = ?"
 	args := []interface{}{userId}
+	countArgs := []interface{}{userId}
+
+	if filterPreferredDates {
+		condition := " AND preferred_start_date <= CURDATE() AND (preferred_end_date IS NULL OR preferred_end_date >= CURDATE())"
+		queryBase += condition
+		countQuery += condition
+	}
 
 	if searchQuery != "" {
 		searchConditions := []string{
@@ -34,30 +42,37 @@ func GetWinesWithPaginationAndSearch(limit, page, userId int, searchQuery string
 			"CAST(quantity AS CHAR) LIKE ?",
 		}
 
+		if !filterPreferredDates {
+			searchConditions = append(searchConditions, "CAST(preferred_start_date AS CHAR) LIKE ?", "CAST(preferred_end_date AS CHAR) LIKE ?")
+		}
+
 		var searchClauses []string
 		for _, condition := range searchConditions {
 			searchClauses = append(searchClauses, condition)
 
 			if strings.Contains(condition, "OR") {
 				args = append(args, "%"+searchQuery+"%", "%"+searchQuery+"%")
+				countArgs = append(countArgs, "%"+searchQuery+"%", "%"+searchQuery+"%")
 			} else {
 				args = append(args, "%"+searchQuery+"%")
+				countArgs = append(countArgs, "%"+searchQuery+"%")
 			}
 		}
 
 		queryBase += " AND (" + strings.Join(searchClauses, " OR ") + ")"
+		countQuery += " AND (" + strings.Join(searchClauses, " OR ") + ")"
 	}
 
 	queryBase += " LIMIT ? OFFSET ?"
 	offset := (page - 1) * limit
 	args = append(args, limit, offset)
 
-	logger.Infow("Executing query", "query", queryBase, "args", args)
+	logger.Infow("Executing query for fetching wines", "query", queryBase, "args", args)
 
 	rows, err := db.Query(queryBase, args...)
 	if err != nil {
 		logger.Errorw("Error executing SELECT query", "error", err, "query", queryBase, "args", args)
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
@@ -83,7 +98,7 @@ func GetWinesWithPaginationAndSearch(limit, page, userId int, searchQuery string
 		err := rows.Scan(dest...)
 		if err != nil {
 			logger.Errorw("Error scanning row", "error", err)
-			return nil, err
+			return nil, 0, err
 		}
 
 		entities = append(entities, *newEntity)
@@ -91,9 +106,19 @@ func GetWinesWithPaginationAndSearch(limit, page, userId int, searchQuery string
 
 	if err := rows.Err(); err != nil {
 		logger.Errorw("Error during rows iteration", "error", err)
-		return nil, err
+		return nil, 0, err
 	}
 
-	logger.Infow("Successfully fetched entities", "count", len(entities), "table", dbName)
-	return entities, nil
+	logger.Infow("Executing query for total count", "query", countQuery, "args", countArgs)
+
+	var totalCount int
+	err = db.QueryRow(countQuery, countArgs...).Scan(&totalCount)
+	if err != nil {
+		logger.Errorw("Error executing COUNT query", "error", err, "query", countQuery, "args", countArgs)
+		return nil, 0, err
+	}
+
+	logger.Infow("Successfully fetched entities and count", "count", len(entities), "totalCount", totalCount, "table", dbName)
+
+	return entities, totalCount, nil
 }

@@ -273,14 +273,198 @@ func POST_CreateWine(c *gin.Context) {
 	})
 }
 
+func POST_editWine(c *gin.Context) {
+	data := database.WineEdit{}
+	if err := c.BindJSON(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Le contenu de la requete est invalide.",
+		})
+		return
+	}
+
+	if data.Domaine.ID == 0 && data.Domaine.Name != "" {
+		res, err := database.InsertEntityById(data.Domaine)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Erreur lors de la création du nouveau domaine.",
+			})
+			return
+		}
+
+		newId, err := res.LastInsertId()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Erreur lors de la récupération d'un élement en base de données. (domain)",
+			})
+			return
+		}
+
+		data.Domaine.ID = int(newId)
+	} else if data.Domaine.ID == 0 && data.Domaine.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni un nom de domaine invalide.",
+		})
+		return
+	} else if data.Domaine.ID < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni un nom de domaine invalide.",
+		})
+		return
+	}
+
+	if data.Region.ID == 0 && data.Region.Name != "" && data.Region.Country != "" {
+		res, err := database.InsertEntityById(data.Region)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Erreur lors de la création d'une nouvelle region.",
+			})
+			return
+		}
+
+		newId, err := res.LastInsertId()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Erreur lors de la récupération d'un élement en base de données. (region)",
+			})
+			return
+		}
+
+		data.Region.ID = int(newId)
+	} else if data.Region.ID == 0 && (data.Region.Name == "" || data.Region.Country == "") {
+		if data.Region.Name == "" && data.Region.Country == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Vous avez fourni une region invalide.",
+			})
+			return
+		}
+
+		if data.Region.Name == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Vous avez fourni un nom de region invalide.",
+			})
+			return
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni un nom de pays pour la région invalide.",
+		})
+		return
+	} else if data.Region.ID < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni un nom de region invalide.",
+		})
+		return
+	}
+
+	if data.Type.ID == 0 && data.Type.Name != "" {
+		res, err := database.InsertEntityById(data.Type)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Erreur lors de la création d'un nouveau type de vin.",
+			})
+			return
+		}
+
+		newId, err := res.LastInsertId()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Erreur lors de la récupération d'un élement en base de données. (type)",
+			})
+			return
+		}
+
+		data.Type.ID = int(newId)
+	} else if data.Type.ID == 0 && data.Type.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni un nom type de vin invalide.",
+		})
+		return
+	} else if data.Type.ID < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni un type de vin invalide.",
+		})
+		return
+	}
+
+	if data.BottleSize.ID == 0 && data.BottleSize.Name != "" && data.BottleSize.Size != 0 {
+		res, err := database.InsertEntityById(data.BottleSize)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Erreur lors de la création d'une nouvelle taille de bouteille.",
+			})
+			return
+		}
+
+		newId, err := res.LastInsertId()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Erreur lors de la récupération d'un élement en base de données. (size)",
+			})
+			return
+		}
+
+		data.BottleSize.ID = int(newId)
+	} else if data.BottleSize.ID == 0 && (data.BottleSize.Name != "" || data.BottleSize.Size != 0) {
+		if data.BottleSize.Name != "" && data.BottleSize.Size != 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Vous avez fourni une taille de bouteille invalide.",
+			})
+			return
+		}
+
+		if data.BottleSize.Name == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Vous avez fourni un nom de taille de bouteille invalide.",
+			})
+			return
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni une taille de bouteille invalide.",
+		})
+		return
+	} else if data.BottleSize.ID < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni une taille de bouteille de vin invalide.",
+		})
+		return
+	}
+
+	if data.PreferredStartDate != "" && data.PreferredEndDate != "" && validateDrinkingDates(data.PreferredStartDate, data.PreferredEndDate) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous avez fourni des dates de consommation invalide.",
+		})
+		return
+	}
+
+	// TODO verify all the sub ids to make sure they exists
+
+	userId := c.GetInt(middlewares.ContextLoggedInUserId)
+	realWine := transformers.EditToWineWineEntity(data)
+	realWine.AccountID = userId
+
+	_, err := database.UpdateEntityById(realWine)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Impossible de mettre à jour votre vin.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+	})
+}
+
 func GET_allWines(c *gin.Context) {
 	userId := c.GetInt(middlewares.ContextLoggedInUserId)
 
 	pageParam := c.DefaultQuery("page", "1")
 	limitParam := c.DefaultQuery("limit", "3")
 	searchQuery := c.DefaultQuery("search", "")
+	filterPreferredDatesParam := c.DefaultQuery("filterPreferredDates", "false")
 
-	logger.Infof("Received parameters: page=%s, limit=%s, search='%s'", pageParam, limitParam, searchQuery)
+	logger.Infof("Received parameters: page=%s, limit=%s, search='%s', filterPreferredDates=%s", pageParam, limitParam, searchQuery, filterPreferredDatesParam)
 
 	page, err := strconv.Atoi(pageParam)
 	if err != nil || page < 1 {
@@ -300,28 +484,20 @@ func GET_allWines(c *gin.Context) {
 		return
 	}
 
-	logger.Infof("Validated parameters: userId=%d, page=%d, limit=%d, search='%s'", userId, page, limit, searchQuery)
+	filterPreferredDates := filterPreferredDatesParam == "true"
 
-	wines, err := database.GetWinesWithPaginationAndSearch(limit, page, userId, searchQuery)
+	logger.Infof("Validated parameters: userId=%d, page=%d, limit=%d, search='%s', filterPreferredDates=%t", userId, page, limit, searchQuery, filterPreferredDates)
+
+	wines, winesCount, err := database.GetWinesWithPaginationAndSearch(limit, page, userId, searchQuery, filterPreferredDates)
 	if err != nil {
-		logger.Errorf("Error fetching wines for userId=%d with search='%s': %v", userId, searchQuery, err)
+		logger.Errorf("Error fetching wines for userId=%d with search='%s' and filterPreferredDates=%t: %v", userId, searchQuery, filterPreferredDates, err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Erreur interne lors de la recupération de vos vins.",
 		})
 		return
 	}
 
-	logger.Infof("Successfully fetched %d wines for userId=%d with search='%s'", len(wines), userId, searchQuery)
-
-	winesCount, err := database.GetUserWinesCount(userId)
-	if err != nil {
-		logger.Errorf("Error fetching wine count for userId=%d: %v", userId, err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Erreur interne lors de la recupération du nombre de vins que vous possédez.",
-		})
-		return
-	}
-
+	logger.Infof("Successfully fetched %d wines for userId=%d with search='%s' and filterPreferredDates=%t", len(wines), userId, searchQuery, filterPreferredDates)
 	logger.Infof("Total wine count for userId=%d is %d", userId, winesCount)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -471,4 +647,32 @@ func DELETE_deleteWine(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "success",
 	})
+}
+
+func GET_wineById(c *gin.Context) {
+	wineID, err := strconv.Atoi(c.Param("id"))
+	if err != nil || wineID <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Identifiant de vin invalide.",
+		})
+		return
+	}
+
+	wine, err := database.SelectEntityById[database.WineWine](wineID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Identifiant de vin invalide.",
+		})
+		return
+	}
+
+	userId := c.GetInt(middlewares.ContextLoggedInUserId)
+	if wine.AccountID != userId {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Vous essayez d'acceder à un vin qui n'est pas a vous.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, wine)
 }

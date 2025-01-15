@@ -369,27 +369,33 @@ function getBottleSizeData() {
 async function submitWineForm(event) {
     event.preventDefault();
 
-    const startDate = document.getElementById("preferredStartDate").value;
-    const endDate = document.getElementById("preferredEndDate").value;
+    const startYear = document.getElementById("preferredStartDate").value;
+    const endYear = document.getElementById("preferredEndDate").value;
 
-    if ((startDate && !endDate) || (!startDate && endDate)) {
-        alert("Les champs 'Date de Début' et 'Date de Fin' doivent être remplis si un des champs est fournie.");
+    if ((startYear && !endYear) || (!startYear && endYear)) {
+        alert("Les champs 'Date de Début' et 'Date de Fin' doivent être remplis si un des champs est fourni.");
         event.preventDefault();
         return false;
     }
 
-    if (startDate && endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
+    let startDate = null;
+    let endDate = null;
 
-        if (start > end) {
+    if (startYear && endYear) {
+        const start = `${startYear}-01-01`; 
+        const end = `${endYear}-12-31`;  
+
+        if (new Date(start) > new Date(end)) {
             alert("'Date de Début' ne peut pas être après 'Date de Fin'.");
             event.preventDefault();
             return false;
         }
+
+        startDate = start;
+        endDate = end;
     }
 
-    jsonToSend = {
+    const jsonToSend = {
         "name": document.getElementById('wineName').value,
         "domain": getDomainData(),
         "region": getRegionData(),
@@ -400,8 +406,8 @@ async function submitWineForm(event) {
         "buy_price": parseFloat(document.getElementById('buyPrice').value) || null,
         "description": document.getElementById('description').value || null,
         "image": document.getElementById('image').value || null,
-        "preferred_start_date": document.getElementById('preferredStartDate').value || null,
-        "preferred_end_date": document.getElementById('preferredEndDate').value || null
+        "preferred_start_date": startDate,
+        "preferred_end_date": endDate
     };
 
     const response = await fetch("/api/wines/create", {

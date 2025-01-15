@@ -697,6 +697,25 @@ body {
     padding: 0 4px;
 }
 
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.filter-button.active {
+    background-color: #28a745;
+}
+
 .search-bar {
     width: 100%;
     padding: 12px;
@@ -912,7 +931,7 @@ body {
     right: 10px;
     display: flex;
     flex-direction: column;
-    z-index: 200;
+    z-index: 98;
     gap: 5px;
 }
 

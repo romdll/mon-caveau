@@ -171,12 +171,12 @@
 
                     <div class="input-group">
                         <div class="input-item">
-                            <label for="preferredStartDate">Date de Début de Consommation Préférée</label>
-                            <input type="date" id="preferredStartDate" name="preferredStartDate">
+                            <label for="preferredStartDate">Année de Début de Consommation Préférée</label>
+                            <input type="number" id="preferredStartDate" name="preferredStartDate" min="1900" max="2100" step="1" placeholder="YYYY">
                         </div>
                         <div class="input-item">
-                            <label for="preferredEndDate">Date de Fin de Consommation Préférée</label>
-                            <input type="date" id="preferredEndDate" name="preferredEndDate">
+                            <label for="preferredEndDate">Année de Fin de Consommation Préférée</label>
+                            <input type="number" id="preferredEndDate" name="preferredEndDate" min="1900" max="2100" step="1" placeholder="YYYY">
                         </div>
                     </div>
                 </div>
@@ -185,6 +185,115 @@
             </form>
         </div>
     </div>
+
+    <div id="editWineModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeEditWineModal()">&times;</span>
+            <h2>Modifier un Vin</h2>
+            <form id="editWineForm" onsubmit="submitEditWineForm(event)">
+                <input type="hidden" id="editWineId" />
+                <div class="input-item">
+                    <label for="editWineName">Nom du Vin</label>
+                    <input type="text" id="editWineName" name="wineName" required>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="editDomain">Domaine</label>
+                        <input type="text" id="editDomainInput" name="domain" oninput="fetchDomains(this.value)"
+                            aria-controls="editDomainSuggestions" onclick="fetchDomains(this.value)" required>
+                        <div id="editDomainSuggestions" class="suggestion-list"></div>
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="editCountry">Pays</label>
+                        <input type="text" id="editCountryInput" name="country" oninput="fetchCountries(this.value)"
+                            aria-controls="editCountrySuggestions" onclick="fetchCountries(this.value)" required>
+                        <div id="editCountrySuggestions" class="suggestion-list"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="editRegion">Région / Département</label>
+                        <input type="text" id="editRegionInput" name="region" oninput="fetchRegions(this.value)"
+                            aria-controls="editRegionSuggestions" onclick="fetchRegions(this.value)" required>
+                        <div id="editRegionSuggestions" class="suggestion-list"></div>
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="editType">Type de Vin</label>
+                        <input type="text" id="editTypeInput" name="type" oninput="fetchTypes(this.value)"
+                            aria-controls="editTypeSuggestions" onclick="fetchTypes(this.value)" required>
+                        <div id="editTypeSuggestions" class="suggestion-list"></div>
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="editBottleSize">Taille de Bouteille</label>
+                        <input type="text" id="editBottleSizeInput" name="bottleSize" oninput="fetchBottleSizes(this.value)"
+                            aria-controls="editBottleSizeSuggestions" onclick="fetchBottleSizes(this.value)" required>
+                        <div id="editBottleSizeSuggestions" class="suggestion-list"></div>
+                    </div>
+                    <div class="input-item">
+                        <input type="hidden" id="editBottleSizeValue" name="editBottleSizeValue" value="1000">
+
+                        <label for="editBottleSizeSlider">Taille de Bouteille</label>
+                        <input type="range" id="editBottleSizeSlider" min="0" max="18000" step="25" value="1000"
+                            oninput="updateEditSliderValue(this.value)">
+                        <label for="editBottleSizeSlider" id="editSliderValueLabel">1000ml</label>
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="editVintage">Millésime</label>
+                        <input type="number" id="editVintage" name="vintage" min="1900" max="2100" value="2000" required>
+                    </div>
+                    <div class="input-item">
+                        <label for="editQuantity">Quantité</label>
+                        <input type="number" id="editQuantity" name="quantity" min="1" value="1" required>
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="editBuyPrice">Prix d'Achat</label>
+                        <input type="number" id="editBuyPrice" name="buyPrice" step="0.01">
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="editDescription">Description</label>
+                        <textarea id="editDescription" name="description" rows="4"></textarea>
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="editImage">URL de l'Image</label>
+                        <input type="text" id="editImage" name="image" placeholder="https://exemple.com/image.jpg">
+                    </div>
+                </div>
+    
+                <div class="input-group">
+                    <div class="input-item">
+                        <label for="editPreferredStartDate">Année de Début de Consommation Préférée</label>
+                        <input type="number" id="editPreferredStartDate" name="preferredStartDate" min="1900" max="2100" step="1" placeholder="YYYY">
+                    </div>
+                    <div class="input-item">
+                        <label for="editPreferredEndDate">Année de Fin de Consommation Préférée</label>
+                        <input type="number" id="editPreferredEndDate" name="preferredEndDate" min="1900" max="2100" step="1" placeholder="YYYY">
+                    </div>
+                </div>
+    
+                <button type="submit">Sauvegarder les modifications</button>
+            </form>
+        </div>
+    </div>    
 
     <div class="main-content" id="mainContent">
 
@@ -244,8 +353,12 @@
 
             <div id="wine-collection">
                 <h3>Voici une vue détaillée de votre collection de vins.</h3>
-                <input type="text" id="searchBar" class="search-bar" placeholder="Rechercher un vin..."
-                    oninput="searchWines()">
+                <div class="search-container">
+                    <input type="text" id="searchBar" class="search-bar" placeholder="Rechercher un vin..." oninput="searchWines()">
+                    <button id="filterPreferredDatesButton" class="filter-button" onclick="togglePreferredDatesFilter()">
+                        Activer le Filtre des Dates Préférées
+                    </button>
+                </div>
                 <div id="wine-collection-list">
                     <div class="wine-list"></div>
                     <div class="pagination" id="pagination"></div>

@@ -41,11 +41,13 @@ func CreateServer() *gin.Engine {
 	r.GET(ApiWinesFetchPaginated, handlers.GET_allWines)
 	r.GET(ApiWinesFetchTransactions, handlers.GET_FetchAllTransactionsForCharts)
 	r.GET(ApiWinesFetchStatistics, handlers.GET_wineStatisticsData)
-	r.POST(ApiWineAdjustQuantity, handlers.POST_AdjustQuantity)
-	r.DELETE(ApiWinesDelete, handlers.DELETE_deleteWine)
 
 	// || Wines
+	r.GET(ApiWinesGet, handlers.GET_wineById)
 	r.POST(ApiWinesWineCreation, handlers.POST_CreateWine)
+	r.POST(ApiWineAdjustQuantity, handlers.POST_AdjustQuantity)
+	r.POST(ApiWinesEdit, handlers.POST_editWine)
+	r.DELETE(ApiWinesDelete, handlers.DELETE_deleteWine)
 
 	// || Frontend
 	r.GET(Frontend, frontend.ServeFrontendFiles)

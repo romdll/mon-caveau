@@ -2,6 +2,20 @@ let winesPerPage = 6;
 let currentPage = 1;
 let totalWines = 0;
 let searchQuery = "";
+let filterPreferredDates = false;
+
+async function togglePreferredDatesFilter() {
+    filterPreferredDates = !filterPreferredDates;
+    const filterButton = document.getElementById("filterPreferredDatesButton");
+    if (filterPreferredDates) {
+        filterButton.textContent = "Désactiver le Filtre des Dates Préférées";
+        filterButton.classList.add("active");
+    } else {
+        filterButton.textContent = "Activer le Filtre des Dates Préférées";
+        filterButton.classList.remove("active");
+    }
+    await loadWines(currentPage);
+}
 
 async function fetchAll() {
     const responseDomains = await fetch("/api/wines/domains");
@@ -86,7 +100,7 @@ async function loadWines(page) {
     });
 
     try {
-        const response = await fetch(`/api/wines?page=${page}&limit=${winesPerPage}&search=${encodeURIComponent(searchQuery)}`);
+        const response = await fetch(`/api/wines?page=${page}&limit=${winesPerPage}&search=${encodeURIComponent(searchQuery)}&filterPreferredDates=${filterPreferredDates}`);
         const data = await response.json();
         const { wines, total } = data;
         totalWines = total;
@@ -103,9 +117,15 @@ async function loadWines(page) {
             const isInactive = wine.quantity === 0;
 
             const today = new Date();
+            const currentYear = today.getFullYear();
+
             const startDate = wine.preferred_start_date ? new Date(wine.preferred_start_date) : null;
             const endDate = wine.preferred_end_date ? new Date(wine.preferred_end_date) : null;
-            const isWithinPreferredDates = startDate && endDate && today >= startDate && today <= endDate;
+
+            const startYear = startDate ? startDate.getFullYear() : null;
+            const endYear = endDate ? endDate.getFullYear() : null;
+
+            const isWithinPreferredDates = startYear && endYear && currentYear >= startYear && currentYear <= endYear;
 
             const wineItem = document.createElement('div');
             wineItem.classList.add('wine-item');
@@ -117,11 +137,11 @@ async function loadWines(page) {
             }
 
             let dateInfo = '';
-            if (startDate || endDate) {
+            if (startYear || endYear) {
                 dateInfo = `
                     <p><strong>Dates Préférées:</strong>
-                        ${startDate ? `Du ${startDate.toLocaleDateString('fr-FR')}` : ''}
-                        ${endDate ? ` au ${endDate.toLocaleDateString('fr-FR')}` : ''}
+                        ${startYear ? `À partir de ${startYear}` : ''}
+                        ${endYear ? ` jusqu'en ${endYear}` : ''}
                     </p>`;
             }
 
@@ -142,7 +162,7 @@ async function loadWines(page) {
                     ${dateInfo}
                 </div>
                 <div class="wine-item-actions">
-                    <button class="edit" onclick="editWine(${wine.id})" ${isInactive ? "disabled" : "disabled"}>Modifier</button>
+                    <button class="edit" onclick="editWine(${wine.id})" ${isInactive ? "disabled" : ""}>Modifier</button>
                     <button class="delete" onclick="askDeleteWine(${wine.id})" ${wine.quantity === 0 ? "disabled" : ""}>Supprimer</button>
                 </div>
                 ${isInactive ? `<span class="wine-badge">Vin Inactif</span>` : ``}
@@ -293,4 +313,146 @@ function adjustPaginationForPhone() {
     }
 
     loadWines(currentPage);
+}
+
+function closeEditWineModal() {
+    document.getElementById("editWineModal").classList.remove('show');
+    document.getElementById("editWineModal").style.opacity = '0';
+    setTimeout(() => {
+        document.getElementById("editWineModal").style.display = 'none';
+    }, 300);
+}
+
+function getEditDomainData() {
+    const domainName = document.getElementById('editDomainInput').value;
+    const domain = jsonDomains ? jsonDomains.find(item => item.name === domainName) : null;
+    return domain ? { "id": domain.id } : { "name": domainName };
+}
+
+function getEditRegionData() {
+    const regionName = document.getElementById('editRegionInput').value;
+    const countryName = document.getElementById('editCountryInput').value;
+
+    if (regionName && countryName && jsonRegionCountries) {
+        const region = jsonRegionCountries.find(item => item.name === regionName && item.country === countryName);
+        return region ? { "id": region.id } : { "name": regionName, "country": countryName };
+    }
+    return { "name": regionName, "country": countryName };
+}
+
+function getEditTypeData() {
+    const typeName = document.getElementById('editTypeInput').value;
+    const type = jsonTypes ? jsonTypes.find(item => item.name === typeName) : null;
+    return type ? { "id": type.id } : { "name": typeName };
+}
+
+function getEditBottleSizeData() {
+    const bottleSizeName = document.getElementById('editBottleSizeInput').value;
+    const bottleSizeValue = parseInt(document.getElementById('editBottleSizeValue').value);
+    const bottleSize = jsonBottleSizes ? jsonBottleSizes.find(item => item.size === bottleSizeValue) : null;
+
+    return bottleSize ? { "id": bottleSize.id } : { "name": bottleSizeName, "size": bottleSizeValue };
+}
+
+async function submitEditWineForm(event) {
+    event.preventDefault();
+
+    const startYear = document.getElementById("editPreferredStartDate").value;
+    const endYear = document.getElementById("editPreferredEndDate").value;
+
+    if ((startYear && !endYear) || (!startYear && endYear)) {
+        alert("Les champs 'Date de Début' et 'Date de Fin' doivent être remplis si un des champs est fourni.");
+        return false;
+    }
+
+    let startDate = null;
+    let endDate = null;
+
+    if (startYear && endYear) {
+        const start = `${startYear}-01-01`;
+        const end = `${endYear}-12-31`;
+
+        if (new Date(start) > new Date(end)) {
+            alert("'Date de Début' ne peut pas être après 'Date de Fin'.");
+            return false;
+        }
+
+        startDate = start;
+        endDate = end;
+    }
+
+    const jsonToSend = {
+        "id": parseInt(document.getElementById("editWineId").value),
+        "name": document.getElementById("editWineName").value,
+        "domain": getEditDomainData(),
+        "region": getEditRegionData(),
+        "type": getEditTypeData(),
+        "bottle_size": getEditBottleSizeData(),
+        "vintage": parseInt(document.getElementById("editVintage").value),
+        "quantity": parseInt(document.getElementById("editQuantity").value),
+        "buy_price": parseFloat(document.getElementById("editBuyPrice").value) || null,
+        "description": document.getElementById("editDescription").value || null,
+        "image": document.getElementById("editImage").value || null,
+        "preferred_start_date": startDate,
+        "preferred_end_date": endDate
+    };
+
+    const response = await fetch("/api/wines/edit", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(jsonToSend)
+    });
+
+    if (response.status === 200) {
+        closeEditWineModal();
+        refresh();
+    } else {
+        console.log(response);
+    }
+}
+
+function updateEditSliderValue(size) {
+    document.getElementById("editSliderValueLabel").textContent = `${size}ml`;
+    document.getElementById("editBottleSizeValue").value = size;
+    document.getElementById("editBottleSizeSlider").value = size;
+}
+
+async function editWine(wineId) {
+    try {
+        const response = await fetch(`/api/wines/${wineId}`);
+        if (!response.ok) {
+            throw new Error("Failed to fetch wine details");
+        }
+
+        const wine = await response.json();
+
+        const domainName = jsonDomains.find(domain => domain.id === wine.domain_id)?.name || "Unknown Domain";
+        const typeName = jsonTypes.find(type => type.id === wine.type_id)?.name || "Unknown Type";
+        const region = jsonRegionCountries.find(region => region.id === wine.region_id);
+        const bottleSize = jsonBottleSizes.find(size => size.id === wine.bottle_size_id);
+
+        document.getElementById("editWineId").value = wineId;
+        document.getElementById("editWineName").value = wine.name;
+        document.getElementById("editDomainInput").value = domainName;
+        document.getElementById("editCountryInput").value = region.country;
+        document.getElementById("editRegionInput").value = region.name;
+        document.getElementById("editTypeInput").value = typeName;
+        document.getElementById("editBottleSizeInput").value = bottleSize.name;
+        updateEditSliderValue(bottleSize.size);
+        document.getElementById("editVintage").value = wine.vintage;
+        document.getElementById("editQuantity").value = wine.quantity;
+        document.getElementById("editBuyPrice").value = wine.buy_price || "";
+        document.getElementById("editDescription").value = wine.description || "";
+        document.getElementById("editImage").value = wine.image || "";
+        document.getElementById("editPreferredStartDate").value = wine.preferred_start_date ? wine.preferred_start_date.split("-")[0] : "";
+        document.getElementById("editPreferredEndDate").value = wine.preferred_end_date ? wine.preferred_end_date.split("-")[0] : "";
+
+        document.getElementById("editWineModal").style.display = "flex";
+        document.getElementById("editWineModal").classList.add("show");
+        document.getElementById("editWineModal").style.opacity = '1';
+    } catch (error) {
+        console.error(error);
+    }
 }
