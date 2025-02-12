@@ -1,5 +1,11 @@
 # Mon Caveau
 
+Mon caveau est un site qui permet de gérer sa cave (ou "caveau"). <br/>
+Ce projet n'est plus en développement et a seulement été créé pour satisfaire un besoin d'un proche. <br/>
+Si vous souhaitez tester avec des données : <br/>
+- Accédez à `{Nom de domaine [www.moncaveau.com] ou votre installation particulière)/debug/fakeit`.
+- Récupérez la clé générée et connectez-vous (`/v1/login`).
+
 ## TODO
 
 - [X] Database system with MySql
