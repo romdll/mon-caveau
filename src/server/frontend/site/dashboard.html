@@ -171,11 +171,11 @@
 
                     <div class="input-group">
                         <div class="input-item">
-                            <label for="preferredStartDate">Année de Début de Consommation Préférée</label>
+                            <label for="preferredStartDate">Début de Période de Dégustation</label>
                             <input type="number" id="preferredStartDate" name="preferredStartDate" min="1900" max="2100" step="1" placeholder="YYYY">
                         </div>
                         <div class="input-item">
-                            <label for="preferredEndDate">Année de Fin de Consommation Préférée</label>
+                            <label for="preferredEndDate">Fin de Période de Dégustation</label>
                             <input type="number" id="preferredEndDate" name="preferredEndDate" min="1900" max="2100" step="1" placeholder="YYYY">
                         </div>
                     </div>
@@ -281,11 +281,11 @@
     
                 <div class="input-group">
                     <div class="input-item">
-                        <label for="editPreferredStartDate">Année de Début de Consommation Préférée</label>
+                        <label for="editPreferredStartDate">Début de Période de Dégustation</label>
                         <input type="number" id="editPreferredStartDate" name="preferredStartDate" min="1900" max="2100" step="1" placeholder="YYYY">
                     </div>
                     <div class="input-item">
-                        <label for="editPreferredEndDate">Année de Fin de Consommation Préférée</label>
+                        <label for="editPreferredEndDate">Fin de Période de Dégustation</label>
                         <input type="number" id="editPreferredEndDate" name="preferredEndDate" min="1900" max="2100" step="1" placeholder="YYYY">
                     </div>
                 </div>
@@ -356,7 +356,7 @@
                 <div class="search-container">
                     <input type="text" id="searchBar" class="search-bar" placeholder="Rechercher un vin..." oninput="searchWines()">
                     <button id="filterPreferredDatesButton" class="filter-button" onclick="togglePreferredDatesFilter()">
-                        Activer le Filtre des Dates Préférées
+                        Afficher uniquement les vins à leur apogée
                     </button>
                 </div>
                 <div id="wine-collection-list">

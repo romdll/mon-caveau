@@ -8,10 +8,10 @@ async function togglePreferredDatesFilter() {
     filterPreferredDates = !filterPreferredDates;
     const filterButton = document.getElementById("filterPreferredDatesButton");
     if (filterPreferredDates) {
-        filterButton.textContent = "Désactiver le Filtre des Dates Préférées";
+        filterButton.textContent = "Afficher tous les vins";
         filterButton.classList.add("active");
     } else {
-        filterButton.textContent = "Activer le Filtre des Dates Préférées";
+        filterButton.textContent = "Afficher uniquement les vins à leur apogée";
         filterButton.classList.remove("active");
     }
     await loadWines(currentPage);
@@ -127,8 +127,10 @@ async function loadWines(page) {
                 const endYear = endDate ? endDate.getFullYear() : null;
     
                 const isWithinPreferredDates = startYear && endYear && currentYear >= startYear && currentYear <= endYear;
-    
+                const isPastPreferredDates = endYear && currentYear > endYear;
+
                 const wineItem = document.createElement('div');
+
                 wineItem.classList.add('wine-item');
                 if (isInactive) {
                     wineItem.classList.add('wine-inactive');
@@ -136,16 +138,19 @@ async function loadWines(page) {
                 if (isWithinPreferredDates) {
                     wineItem.classList.add('highlight-preferred');
                 }
+                if (isPastPreferredDates) {
+                    wineItem.classList.add('highlight-past-preferred');
+                }
     
                 let dateInfo = '';
                 if (startYear || endYear) {
                     dateInfo = `
-                        <p><strong>Dates Préférées:</strong>
+                        <p><strong>Période de Dégustation:</strong>
                             ${startYear ? `À partir de ${startYear}` : ''}
                             ${endYear ? ` jusqu'en ${endYear}` : ''}
                         </p>`;
                 }
-    
+
                 wineItem.innerHTML = `
                     <div class="quick-actions">
                         <button class="decrement" onclick="adjustQuantity(${wine.id}, -1)" ${isInactive ? "disabled" : ""}>-1</button>
@@ -167,7 +172,8 @@ async function loadWines(page) {
                         <button class="delete" onclick="askDeleteWine(${wine.id})" ${wine.quantity === 0 ? "disabled" : ""}>Supprimer</button>
                     </div>
                     ${isInactive ? `<span class="wine-badge">Vin Inactif</span>` : ``}
-                    ${isWithinPreferredDates ? `<span class="wine-badge preferred-badge">Dates Préférées Actives</span>` : ``}
+                    ${isWithinPreferredDates ? `<span class="wine-badge preferred-badge">À son apogée</span>` : ``}
+                    ${isPastPreferredDates ? `<span class="wine-badge expired-badge">Période de dégustation dépassée</span>` : ``}
                 `;
     
                 placeholders[index].replaceWith(wineItem);
